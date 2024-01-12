@@ -1,2 +1,11 @@
 Hello
-{{book}}
+{{book.Name}}
+
+{% for book in book %}
+<div>
+    <b>Book Name : </b>{{book['Name']}}
+</div>
+<div style='margin-bottom:20px;'>
+    <b>Issue Date : </b> {{book['Date_created']}}
+</div>
+{% endfor %}

@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+from flask_restful import Resource, Api
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -18,7 +19,6 @@ class Book(db.Model):
     Description = db.Column(db.String)
 
 book = Book.query.all()
-print(book)
 
 @app.route("/", methods = ["GET","POST"])
 def home():
