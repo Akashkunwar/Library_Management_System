@@ -46,8 +46,23 @@ class BookAPI(Resource):
         db.session.add(new_book)
         db.session.commit()
         return "Added successfully", 201
+    
+    def put(self, ID):
+        to_update = Book.query.get(ID)
+        args = parser.parse_args()
+        to_update.Name = args["Name"]
+        to_update.Date_created = args["Date_created"]
+        to_update.Description = args["Description"]
+        db.session.commit()
+        return f"Updated data for {ID} Successfully"
 
-api.add_resource(BookAPI, "/API/AllBooks", "/API/AddBooks")
+    def delete(self, ID):
+        to_delete = Book.query.get(ID)
+        db.session.delete(to_delete)
+        db.session.commit()
+        return f"Deleted data for {ID} Successfully"
+
+api.add_resource(BookAPI, "/API/AllBooks", "/API/AddBooks", "/API/<int:ID>/UpdateBooks", "/API/<int:ID>/DeleteBooks")
 
 @app.route("/", methods = ["GET","POST"])
 def home():
@@ -60,3 +75,9 @@ if __name__ == '__main__':
         debug=True,
         port=8080
     )
+
+
+# GET /API/AllBooks
+# POST/API/AddBooks
+# PUT /API/<int:ID>/UpdateBooks
+# DELETE /API/<int:ID>/DeleteBooks
