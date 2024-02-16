@@ -66,6 +66,18 @@ api.add_resource(BookAPI, "/API/AllBooks", "/API/AddBooks", "/API/<int:ID>/Updat
 
 @app.route("/", methods = ["GET","POST"])
 def home():
+    return render_template("start.html")
+
+@app.route("/user-login", methods = ["GET","POST"])
+def userLogin():
+    return render_template("user-login.html")
+
+@app.route("/librarian-login", methods = ["GET","POST"])
+def librarianLogin():
+    return render_template("librarian-login.html")
+
+@app.route("/adminLogin", methods = ["GET","POST"])
+def admin():
     book = Book.query.all()
     return render_template("home.html", book=book)
 
@@ -75,6 +87,8 @@ if __name__ == '__main__':
         debug=True,
         port=8080
     )
+
+
 
 
 # GET /API/AllBooks
