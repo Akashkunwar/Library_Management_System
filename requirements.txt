@@ -1,3 +1,5 @@
 Flask
 Flask-SQLAlchemy
 flask-restful
+email-validator
+bcrypt
