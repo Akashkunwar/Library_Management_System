@@ -85,6 +85,10 @@ def userLogin():
 def librarianLogin():
     return render_template("librarian-login.html")
 
+@app.route("/add-section", methods = ["GET","POST"])
+def addSection():
+    return render_template("add-section.html")
+
 @app.route("/adminLogin", methods = ["GET","POST"])
 def admin():
     book = Book.query.all()
