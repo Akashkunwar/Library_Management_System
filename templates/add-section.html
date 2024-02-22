@@ -11,9 +11,36 @@
     <div>
       {% include 'header.html' %}
       <div>
-        <button type="button" id="add-section" class="btn btn-outline-primary">
+        <button type="button" id="addSection" class="btn btn-outline-primary">
           + Add<br />Section
         </button>
+        <div id="myPopup" class="popup">
+          <div class="popup-content">
+            <h1>Add Section</h1>
+            <div>
+              <h4>Section</h4>
+              <input type="text" placeholder="Section Name" />
+            </div>
+            <div>
+              <h4>Creation Date :</h4>
+              <p id="current-date">Creation date</p>
+            </div>
+            <div>
+              <h4>Description</h4>
+              <textarea
+                name="text"
+                id="Description"
+                cols="50"
+                rows="4"
+                placeholder="Description"
+              ></textarea>
+            </div>
+            <div class="buttons">
+              <button class="btn btn-outline-primary">save</button>
+              <button class="btn btn-primary" id="closePopup">Close</button>
+            </div>
+          </div>
+        </div>
         <div class="main-container">
           <div class="section-container">
             <h2>History Section</h2>
@@ -178,5 +205,31 @@
       </div>
       {% include 'footer.html' %}
     </div>
+    <script>
+      addSection.addEventListener("click", function () {
+        myPopup.classList.add("show");
+      });
+      closePopup.addEventListener("click", function () {
+        myPopup.classList.remove("show");
+      });
+      window.addEventListener("click", function (event) {
+        if (event.target == myPopup) {
+          myPopup.classList.remove("show");
+        }
+      });
+      const currentDate = document.getElementById("current-date");
+      // const d = new Date();
+      const d = new Date();
+
+      const options = {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      };
+
+      const formattedDate = d.toLocaleDateString("en-GB", options);
+
+      currentDate.textContent = formattedDate;
+    </script>
   </body>
 </html>
