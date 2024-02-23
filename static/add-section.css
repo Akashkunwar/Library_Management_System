@@ -5,7 +5,7 @@ body {
 
 #addSection {
   border-radius: 60px;
-  position: absolute;
+  position: fixed;
   padding: 20px;
   right: 20px;
   top: 80px;
@@ -13,9 +13,7 @@ body {
   font-size: larger;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   font-weight: bolder;
-  /* display: block; */
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-  /* z-index: 1; */
 }
 
 .main-container {
@@ -35,8 +33,6 @@ body {
   padding: 20px 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
   text-align: center;
-  /* margin-right: 20px; */
-  /* margin: 0 20px 20px 0; */
   width: 20%;
   flex-grow: 1;
 }
@@ -89,7 +85,8 @@ textarea:focus {
   border: solid 1px #0d6efd;
 }
 
-#current-date {
+#current-date,
+#current-section {
   padding-left: 15px;
   background-color: aliceblue;
   border: #0d6efd;
@@ -129,6 +126,7 @@ h4 {
   background-color: rgba(0, 0, 0, 0.4);
   display: none;
 }
+
 .popup-content {
   background-color: white;
   margin: 10% auto;
@@ -138,10 +136,12 @@ h4 {
   font-weight: bolder;
   border-radius: 10px;
 }
+
 .popup-content button {
   display: block;
   margin: 0 auto;
 }
+
 .show {
   display: block;
 }
