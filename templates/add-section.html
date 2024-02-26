@@ -42,7 +42,7 @@
           </div>
         </div>
         <div class="main-container">
-          <div class="section-container">
+          <div class="section-container" id="1">
             <h2>History Section 1</h2>
             <p>Date Created : 01/01/2024</p>
             <div>
@@ -57,7 +57,7 @@
               Add Books
             </button>
           </div>
-          {% include 'popup.html' %}
+          {% include 'addBookPopup.html' %}
           <div class="section-container">
             <h2>History Section</h2>
             <p>Date Created : 01/01/2024</p>
@@ -236,6 +236,12 @@
       window.addEventListener("click", function (event) {
         if (event.target == addBookPopup) {
           addBookPopup.classList.remove("show");
+        }
+      });
+
+      document.getElementById("1").addEventListener("click", function (event) {
+        if (event.target.id === "1") {
+          window.location.href = "/showBooks";
         }
       });
     </script>

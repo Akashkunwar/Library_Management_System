@@ -28,7 +28,7 @@ class User(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 
 # book = Book.query.all()
-print(User.query.all())
+# print(User.query.all())
 
 parser = reqparse.RequestParser()
 parser.add_argument('Name')
@@ -89,10 +89,15 @@ def librarianLogin():
 def addSection():
     return render_template("add-section.html")
 
+@app.route("/showBooks", methods = ["GET","POST"])
+def showBooks():
+    return render_template("showBooks.html")
+
 @app.route("/adminLogin", methods = ["GET","POST"])
 def admin():
     book = Book.query.all()
     return render_template("home.html", book=book)
+
 
 if __name__ == '__main__':
     app.run(

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add-Section</title>
+    <link rel="stylesheet" href="/static/add-section.css" />
+    {% include 'bootstrap.html' %}
+  </head>
+  <body>
+    <div>
+      {% include 'header.html' %}
+      <div>
+        <div class="main-container">
+          <div class="section-container" id="1">
+            <h2>History Book class 10</h2>
+            <p>Book Author : John Doe</p>
+            <div>
+              <p>Book Section : History</p>
+            </div>
+            <button type="button" id="showBook" class="btn btn-outline-primary">
+              Show
+            </button>
+            <button
+              type="button"
+              id="editBooks"
+              class="btn btn-outline-secondary"
+            >
+              Edit
+            </button>
+            <button type="button" class="btn btn-outline-danger">Delete</button>
+          </div>
+          {% include 'editBookPopup.html' %} {% include 'showBookPopup.html' %}
+          <div class="section-container" id="1">
+            <h2>History Book class 11</h2>
+            <p>Book Author : John Doe</p>
+            <div>
+              <p>Book Section : History</p>
+            </div>
+            <button type="button" class="btn btn-outline-primary">Show</button>
+            <button type="button" class="btn btn-outline-secondary">
+              Edit
+            </button>
+            <button type="button" class="btn btn-outline-danger">Delete</button>
+          </div>
+          <div class="section-container" id="1">
+            <h2>History Book class 11</h2>
+            <p>Book Author : John Doe</p>
+            <div>
+              <p>Book Section : History</p>
+            </div>
+            <button type="button" class="btn btn-outline-primary">Show</button>
+            <button type="button" class="btn btn-outline-secondary">
+              Edit
+            </button>
+            <button type="button" class="btn btn-outline-danger">Delete</button>
+          </div>
+          <div class="section-container" id="1">
+            <h2>History Book class 11</h2>
+            <p>Book Author : John Doe</p>
+            <div>
+              <p>Book Section : History</p>
+            </div>
+            <button type="button" class="btn btn-outline-primary">Show</button>
+            <button type="button" class="btn btn-outline-secondary">
+              Edit
+            </button>
+            <button type="button" class="btn btn-outline-danger">Delete</button>
+          </div>
+          <div class="section-container" id="1">
+            <h2>History Book class 11</h2>
+            <p>Book Author : John Doe</p>
+            <div>
+              <p>Book Section : History</p>
+            </div>
+            <button type="button" class="btn btn-outline-primary">Show</button>
+            <button type="button" class="btn btn-outline-secondary">
+              Edit
+            </button>
+            <button type="button" class="btn btn-outline-danger">Delete</button>
+          </div>
+          <div class="section-container" id="1">
+            <h2>History Book class 11</h2>
+            <p>Book Author : John Doe</p>
+            <div>
+              <p>Book Section : History</p>
+            </div>
+            <button type="button" class="btn btn-outline-primary">Show</button>
+            <button type="button" class="btn btn-outline-secondary">
+              Edit
+            </button>
+            <button type="button" class="btn btn-outline-danger">Delete</button>
+          </div>
+        </div>
+      </div>
+      {% include 'footer.html' %}
+    </div>
+    <script>
+      showBook.addEventListener("click", function () {
+        showBooksPopup.classList.add("show");
+      });
+      closeShowBooksPopup.addEventListener("click", function () {
+        showBooksPopup.classList.remove("show");
+      });
+      window.addEventListener("click", function (event) {
+        if (event.target == showBooksPopup) {
+          showBooksPopup.classList.remove("show");
+        }
+      });
+
+      editBooks.addEventListener("click", function () {
+        editBooksPopup.classList.add("show");
+      });
+      closeEditBooksPopup.addEventListener("click", function () {
+        editBooksPopup.classList.remove("show");
+      });
+      window.addEventListener("click", function (event) {
+        if (event.target == editBooksPopup) {
+          editBooksPopup.classList.remove("show");
+        }
+      });
+    </script>
+  </body>
+</html>
