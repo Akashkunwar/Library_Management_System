@@ -52,20 +52,7 @@ class UserAPI(Resource):
                 }
                 users_data.append(user_data)
             return users_data, 200
-        
-    # def get(self, user_id):
-    #     user = User.query.get(user_id)
-    #     if user:
-    #         user_data = {
-    #             'UserId' : user.UserId,
-    #             'UserName' : user.UserName,
-    #             'Passwod' : user.Password,
-    #             'Role' : user.Role
-    #         }
-    #         return user_data, 200
-    #     else:
-    #         return "User not found", 404
-    
+            
     def post(self):
         args = user_parser.parse_args()
         new_user = User(
@@ -98,7 +85,9 @@ class UserAPI(Resource):
         else:
             return f"User with id {user_id} not found", 400
 
-api.add_resource(UserAPI, "/API/Users")
+api.add_resource(UserAPI, "/API/Users", "/API/Users/<int:user_id>")
+
+
 
 class Section(db.Model):
     __tablename__ = 'section'
@@ -113,19 +102,33 @@ section_parser.add_argument('Title', type=str, required=True, help='Title is req
 section_parser.add_argument('Description', type=str, required=True, help='Description is required')
 section_parser.add_argument('ImageLink', type=str)
 class SectionAPI(Resource):
-    def get(self, section_id):
-        section = Section.query.get(section_id)
-        if section:
-            section_data = {
-                'SectionId': section.SectionId,
-                'Title': section.Title,
-                'CreatedDate': section.CreatedDate.strftime('%Y-%m-%d %H:%M:%S'),
-                'Description': section.Description,
-                'ImageLink': section.ImageLink
-            }
-            return section_data, 200
+    def get(self, section_id=None):
+        if section_id:
+            section = Section.query.get(section_id)
+            if section:
+                section_data = {
+                    'SectionId': section.SectionId,
+                    'Title': section.Title,
+                    'CreatedDate': section.CreatedDate.strftime('%Y-%m-%d %H:%M:%S'),
+                    'Description': section.Description,
+                    'ImageLink': section.ImageLink
+                }
+                return section_data, 200
+            else:
+                return "Section not found", 404
         else:
-            return "Section not found", 404
+            sections = Section.query.all()
+            sections_data = []
+            for section in sections:
+                section_data = {
+                    'SectionId': section.SectionId,
+                    'Title': section.Title,
+                    'CreatedDate': section.CreatedDate.strftime('%Y-%m-%d %H:%M:%S'),
+                    'Description': section.Description,
+                    'ImageLink': section.ImageLink
+                }
+                sections_data.append(section_data)
+                return sections_data, 200
     
     def post(self):
         args = section_parser.parse_args()
@@ -159,10 +162,109 @@ class SectionAPI(Resource):
         else:
             return f"Section with ID {section_id} not found", 404
 
-api.add_resource(SectionAPI, "/API/Sections")
+api.add_resource(SectionAPI, "/API/Sections", "/API/Sections/<int:section_id>")
+
+class Books(db.Model):
+    __tablename__ = 'books'
+    BookId = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    SectionId = db.Column(db.Integer, db.ForeignKey('section.SectionId'), nullable=False)
+    Title = db.Column(db.String(50), nullable=False)
+    Author = db.Column(db.String(50), nullable=False)
+    Content = db.Column(db.Text)
+    ImageLink = db.Column(db.String(255))
+
+book_parser = reqparse.RequestParser()
+book_parser.add_argument('SectionId', type=int, required=True,help="SectionID is required")
+book_parser.add_argument('Title', type=str, required=True,help="Title is required")
+book_parser.add_argument('Author', type=str, required=True,help="Author is required")
+book_parser.add_argument('Content', type=str)
+book_parser.add_argument('ImageLink', type=str)
+class BooksAPI(Resource):
+    def get(self, book_id=None):
+        if book_id:
+            book = Books.query.get(book_id)
+            if book:
+                book_data = {
+                    "BookId" : book.BookId,
+                    "SectionId" : book.SectionId,
+                    "Title" : book.Title,
+                    "Author" : book.Author,
+                    "Content": book.Content,
+                    "ImageLink":book.ImageLink
+                }
+                return book_data, 200
+            else:
+                return f"No Book with {book_id} found", 400
+        else:
+            books = Books.query.all()
+            books_data = []
+            for book in books:
+                book_data = {
+                    "BookId" : book.BookId,
+                    "SectionId" : book.SectionId,
+                    "Title" : book.Title,
+                    "Author" : book.Author,
+                    "Content": book.Content,
+                    "ImageLink":book.ImageLink
+                }
+                books_data.append(book_data)
+            return books_data, 200
+        
+    def post(self):
+        args = book_parser.parse_args()
+        new_section = Books(
+            SectionId = args['SectionId'],
+            Title = args['Title'],
+            Author = args['Author'],
+            Content = args['Content'],
+            ImageLink = args['ImageLink']
+        )
+        db.session.add(new_section)
+        db.session.commit()
+        return "Book added successfully", 200
+
+    def put(self, book_id):
+        args = book_parser.parse_args()
+        book = Books.query.get(book_id)
+        if book:
+            book.SectionId = args['SectionId'],
+            book.Title = args['Title'],
+            book.Author = args['Author'],
+            book.Content = args['Content'],
+            book.ImageLink = args['ImageLink']
+            db.session.commit()
+            return f"Book data updated for {book_id}", 200
+        else:
+            return f"Book for ID {book_id} not found", 400
+    
+    def delete(self, book_id):
+        book = Books.query.get(book_id)
+        if book:
+            db.session.delete(book_id)
+            db.session.commit()
+            return f"Book for ID {book_id} deleted", 200
+        else:
+            return f"No book with {book_id} found", 400
+
+
+
+api.add_resource(BooksAPI,"/API/Books", "/API/Books/<int:book_id>")
+
+# CREATE TABLE "Books" (
+# 	"BookId"	INTEGER,
+# 	"SectionId"	INTEGER,
+# 	"Title"	VARCHAR(50) NOT NULL,
+# 	"Author"	VARCHAR(50) NOT NULL,
+# 	"Content"	text,
+# 	"ImageLink"	VARCHAR(255),
+# 	PRIMARY KEY("BookId" AUTOINCREMENT),
+# 	FOREIGN KEY("SectionId") REFERENCES "Section"("SectionId")
+# );
+
+
 
 # book = Book.query.all()
-print(Section.query.all())
+# print(Section.query.all())
 
 ## This is Sample I created to learn sql lite connectivity
 # class Book(db.Model):
