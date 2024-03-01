@@ -128,7 +128,7 @@ class SectionAPI(Resource):
                     'ImageLink': section.ImageLink
                 }
                 sections_data.append(section_data)
-                return sections_data, 200
+            return sections_data, 200
     
     def post(self):
         args = section_parser.parse_args()
@@ -227,10 +227,10 @@ class BooksAPI(Resource):
         args = book_parser.parse_args()
         book = Books.query.get(book_id)
         if book:
-            book.SectionId = args['SectionId'],
-            book.Title = args['Title'],
-            book.Author = args['Author'],
-            book.Content = args['Content'],
+            book.SectionId = args['SectionId']
+            book.Title = args['Title']
+            book.Author = args['Author']
+            book.Content = args['Content']
             book.ImageLink = args['ImageLink']
             db.session.commit()
             return f"Book data updated for {book_id}", 200
@@ -240,15 +240,136 @@ class BooksAPI(Resource):
     def delete(self, book_id):
         book = Books.query.get(book_id)
         if book:
-            db.session.delete(book_id)
+            db.session.delete(book)
             db.session.commit()
             return f"Book for ID {book_id} deleted", 200
         else:
             return f"No book with {book_id} found", 400
 
-
-
 api.add_resource(BooksAPI,"/API/Books", "/API/Books/<int:book_id>")
+
+# CREATE TABLE "BookIssue" (
+# 	"IssueId"	INTEGER,
+# 	"UserId"	INTEGER,
+# 	"BookId"	INTEGER,
+# 	"SectionId"	INTEGER,
+# 	"RequestDate"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+# 	"Days"	INTEGER NOT NULL,
+# 	"IssueDate"	date,
+# 	"IssueStatus"	varchar(20) NOT NULL,
+# 	"LastIssueStatusDate"	date,
+# 	PRIMARY KEY("IssueId" AUTOINCREMENT),
+# 	FOREIGN KEY("BookId") REFERENCES "Books"("BookId"),
+# 	FOREIGN KEY("UserId") REFERENCES "User"("UserId"),
+# 	FOREIGN KEY("SectionId") REFERENCES "Section"("SectionId")
+# );
+
+class BookIssue(db.Model):
+    __tablename__ = 'BookIssue'
+    IssueId = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    UserId = db.Column(db.Integer, db.ForeignKey('User.UserId'), nullable=False)
+    BookId = db.Column(db.Integer, db.ForeignKey('Books.BookId'), nullable=False)
+    SectionId = db.Column(db.Integer, db.ForeignKey('section.SectionId'), nullable=False)
+    RequestDate = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    Days = db.Column(db.Integer, nullable=False)
+    IssueDate = db.Column(db.DateTime)
+    IssueStatus = db.Column(db.String, nullable=False)
+    LastIssueStatusDate = db.Column(db.DateTime)
+
+BookIssue_parser = reqparse.RequestParser()
+BookIssue_parser.add_argument('UserId', type=int, required=True, help='UserId is required')
+BookIssue_parser.add_argument('BookId', type=int, required=True, help='BookId is required')
+BookIssue_parser.add_argument('SectionId', type=int, required=True, help='SectionId is required')
+BookIssue_parser.add_argument('Days', type=int, required=True, help='Days is required')
+BookIssue_parser.add_argument('IssueDate', type=lambda x: datetime.strptime(x, '%Y-%m-%d'), help='IssueDate in format YYYY-MM-DD HH:MM:SS')
+BookIssue_parser.add_argument('IssueStatus', type=str, required=True, help='IssueStatus is required')
+BookIssue_parser.add_argument('LastIssueStatusDate', type=lambda x: datetime.strptime(x, '%Y-%m-%d'), help='LastIssueStatusDate in format YYYY-MM-DD HH:MM:%S')
+
+
+class BookIssueApi(Resource):
+    def get(self, issue_id=None):
+        if issue_id:
+            issue = BookIssue.query.get(issue_id)
+            if issue:
+                issue_data = {
+                    "IssueId" : issue.IssueId,
+                    "UserId" : issue.UserId,
+                    "BookId" : issue.BookId,
+                    "SectionId" : issue.SectionId,
+                    "RequestDate" : issue.RequestDate.strftime('%Y-%m-%d %H:%M:%S'),
+                    "Days" : issue.Days,
+                    "IssueDate" : issue.IssueDate.strftime('%Y-%m-%d'),
+                    "IssueStatus" : issue.IssueStatus,
+                    "LastIssueStatusDate" : issue.LastIssueStatusDate.strftime('%Y-%m-%d'),
+                }
+                return issue_data, 200
+            else:
+                return f"No issue with {issue_id}"
+        else:
+            issues = BookIssue.query.all()
+            issues_data = []
+            for issue in issues:
+                issue_data = {
+                "IssueId" : issue.IssueId,
+                "UserId" : issue.UserId,
+                "BookId" : issue.BookId,
+                "SectionId" : issue.SectionId,
+                "RequestDate" : issue.RequestDate.strftime('%Y-%m-%d %H:%M:%S'),
+                "Days" : issue.Days,
+                "IssueDate" : issue.IssueDate.strftime('%Y-%m-%d'),
+                "IssueStatus" : issue.IssueStatus,
+                "LastIssueStatusDate" : issue.LastIssueStatusDate.strftime('%Y-%m-%d'),
+                }
+                issues_data.append(issue_data)
+            return issues_data, 200
+    
+    def post(self):
+        args = BookIssue_parser.parse_args()
+        new_issue = BookIssue(
+            UserId = args["UserId"],
+            BookId = args["BookId"],
+            SectionId = args["SectionId"],
+            RequestDate = datetime.strptime(args["RequestDate"], '%Y-%m-%d %H:%M:%S'),
+            Days = args["Days"],
+            IssueDate = datetime.strptime(args["IssueDate"], '%Y-%m-%d'),
+            IssueStatus = args["IssueStatus"],
+            LastIssueStatusDate = datetime.strptime(args["LastIssueStatusDate"], '%Y-%m-%d')
+        )
+        db.session.add(new_issue)
+        db.session.commit()
+        return "Book added successfully", 200
+    
+    def put(self, issue_id):
+        args = BookIssue_parser.parse_args()
+        issue = BookIssue.query.get(issue_id)
+        if issue:
+            issue.UserId = args["UserId"]
+            issue.BookId = args["BookId"]
+            issue.SectionId = args["SectionId"]
+            issue.RequestDate = datetime.strptime(args["RequestDate"], '%Y-%m-%d %H:%M:%S')
+            issue.Days = args["Days"]
+            issue.IssueDate = datetime.strptime(args["IssueDate"], '%Y-%m-%d')
+            issue.IssueStatus = args["IssueStatus"]
+            issue.LastIssueStatusDate = datetime.strptime(args["LastIssueStatusDate"], '%Y-%m-%d')
+            db.session.commit()
+            return f"Book Issue Updated for {issue_id}"
+        else:
+            return f"No Issue found with {issue_id}"
+    
+    def delete(self, issue_id):
+        issue = BookIssue.query.get(issue_id)
+        if issue:
+            db.session.delete(issue)
+            db.session.commit()
+            return f"Issue deleted with ID {issue_id}",200
+        else:
+            return f"No issue found with {issue_id}",400
+
+api.add_resource(BookIssueApi,"/API/BookIssue","/API/BookIssue/<int:issue_id>")
+            
+
+
+    
 
 # CREATE TABLE "Books" (
 # 	"BookId"	INTEGER,
