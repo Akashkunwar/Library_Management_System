@@ -88,7 +88,6 @@ class UserAPI(Resource):
 api.add_resource(UserAPI, "/API/Users", "/API/Users/<int:user_id>")
 
 
-
 class Section(db.Model):
     __tablename__ = 'section'
     SectionId = db.Column(db.Integer, autoincrement=True, primary_key=True)
@@ -179,6 +178,7 @@ book_parser.add_argument('Title', type=str, required=True,help="Title is require
 book_parser.add_argument('Author', type=str, required=True,help="Author is required")
 book_parser.add_argument('Content', type=str)
 book_parser.add_argument('ImageLink', type=str)
+
 class BooksAPI(Resource):
     def get(self, book_id=None):
         if book_id:
@@ -248,42 +248,27 @@ class BooksAPI(Resource):
 
 api.add_resource(BooksAPI,"/API/Books", "/API/Books/<int:book_id>")
 
-# CREATE TABLE "BookIssue" (
-# 	"IssueId"	INTEGER,
-# 	"UserId"	INTEGER,
-# 	"BookId"	INTEGER,
-# 	"SectionId"	INTEGER,
-# 	"RequestDate"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-# 	"Days"	INTEGER NOT NULL,
-# 	"IssueDate"	date,
-# 	"IssueStatus"	varchar(20) NOT NULL,
-# 	"LastIssueStatusDate"	date,
-# 	PRIMARY KEY("IssueId" AUTOINCREMENT),
-# 	FOREIGN KEY("BookId") REFERENCES "Books"("BookId"),
-# 	FOREIGN KEY("UserId") REFERENCES "User"("UserId"),
-# 	FOREIGN KEY("SectionId") REFERENCES "Section"("SectionId")
-# );
 
 class BookIssue(db.Model):
     __tablename__ = 'BookIssue'
     IssueId = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    UserId = db.Column(db.Integer, db.ForeignKey('User.UserId'), nullable=False)
-    BookId = db.Column(db.Integer, db.ForeignKey('Books.BookId'), nullable=False)
-    SectionId = db.Column(db.Integer, db.ForeignKey('section.SectionId'), nullable=False)
+    UserId = db.Column(db.Integer, db.ForeignKey(User.UserId), nullable=False)
+    BookId = db.Column(db.Integer, db.ForeignKey(Books.BookId), nullable=False)
+    SectionId = db.Column(db.Integer, db.ForeignKey(Section.SectionId), nullable=False)
     RequestDate = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
     Days = db.Column(db.Integer, nullable=False)
-    IssueDate = db.Column(db.DateTime)
+    IssueDate = db.Column(db.String)
     IssueStatus = db.Column(db.String, nullable=False)
-    LastIssueStatusDate = db.Column(db.DateTime)
+    LastIssueStatusDate = db.Column(db.String)
 
 BookIssue_parser = reqparse.RequestParser()
 BookIssue_parser.add_argument('UserId', type=int, required=True, help='UserId is required')
 BookIssue_parser.add_argument('BookId', type=int, required=True, help='BookId is required')
 BookIssue_parser.add_argument('SectionId', type=int, required=True, help='SectionId is required')
 BookIssue_parser.add_argument('Days', type=int, required=True, help='Days is required')
-BookIssue_parser.add_argument('IssueDate', type=lambda x: datetime.strptime(x, '%Y-%m-%d'), help='IssueDate in format YYYY-MM-DD HH:MM:SS')
+BookIssue_parser.add_argument('IssueDate', type=str)
 BookIssue_parser.add_argument('IssueStatus', type=str, required=True, help='IssueStatus is required')
-BookIssue_parser.add_argument('LastIssueStatusDate', type=lambda x: datetime.strptime(x, '%Y-%m-%d'), help='LastIssueStatusDate in format YYYY-MM-DD HH:MM:%S')
+BookIssue_parser.add_argument('LastIssueStatusDate', type=str)
 
 
 class BookIssueApi(Resource):
@@ -298,9 +283,9 @@ class BookIssueApi(Resource):
                     "SectionId" : issue.SectionId,
                     "RequestDate" : issue.RequestDate.strftime('%Y-%m-%d %H:%M:%S'),
                     "Days" : issue.Days,
-                    "IssueDate" : issue.IssueDate.strftime('%Y-%m-%d'),
+                    "IssueDate" : issue.IssueDate,
                     "IssueStatus" : issue.IssueStatus,
-                    "LastIssueStatusDate" : issue.LastIssueStatusDate.strftime('%Y-%m-%d'),
+                    "LastIssueStatusDate" : issue.LastIssueStatusDate,
                 }
                 return issue_data, 200
             else:
@@ -316,9 +301,9 @@ class BookIssueApi(Resource):
                 "SectionId" : issue.SectionId,
                 "RequestDate" : issue.RequestDate.strftime('%Y-%m-%d %H:%M:%S'),
                 "Days" : issue.Days,
-                "IssueDate" : issue.IssueDate.strftime('%Y-%m-%d'),
+                "IssueDate" : issue.IssueDate,
                 "IssueStatus" : issue.IssueStatus,
-                "LastIssueStatusDate" : issue.LastIssueStatusDate.strftime('%Y-%m-%d'),
+                "LastIssueStatusDate" : issue.LastIssueStatusDate,
                 }
                 issues_data.append(issue_data)
             return issues_data, 200
@@ -329,11 +314,10 @@ class BookIssueApi(Resource):
             UserId = args["UserId"],
             BookId = args["BookId"],
             SectionId = args["SectionId"],
-            RequestDate = datetime.strptime(args["RequestDate"], '%Y-%m-%d %H:%M:%S'),
             Days = args["Days"],
-            IssueDate = datetime.strptime(args["IssueDate"], '%Y-%m-%d'),
+            IssueDate = args["IssueDate"],
             IssueStatus = args["IssueStatus"],
-            LastIssueStatusDate = datetime.strptime(args["LastIssueStatusDate"], '%Y-%m-%d')
+            LastIssueStatusDate = args["LastIssueStatusDate"]
         )
         db.session.add(new_issue)
         db.session.commit()
@@ -346,11 +330,10 @@ class BookIssueApi(Resource):
             issue.UserId = args["UserId"]
             issue.BookId = args["BookId"]
             issue.SectionId = args["SectionId"]
-            issue.RequestDate = datetime.strptime(args["RequestDate"], '%Y-%m-%d %H:%M:%S')
             issue.Days = args["Days"]
-            issue.IssueDate = datetime.strptime(args["IssueDate"], '%Y-%m-%d')
+            issue.IssueDate = args["IssueDate"]
             issue.IssueStatus = args["IssueStatus"]
-            issue.LastIssueStatusDate = datetime.strptime(args["LastIssueStatusDate"], '%Y-%m-%d')
+            issue.LastIssueStatusDate = args["LastIssueStatusDate"]
             db.session.commit()
             return f"Book Issue Updated for {issue_id}"
         else:
@@ -368,76 +351,7 @@ class BookIssueApi(Resource):
 api.add_resource(BookIssueApi,"/API/BookIssue","/API/BookIssue/<int:issue_id>")
             
 
-
-    
-
-# CREATE TABLE "Books" (
-# 	"BookId"	INTEGER,
-# 	"SectionId"	INTEGER,
-# 	"Title"	VARCHAR(50) NOT NULL,
-# 	"Author"	VARCHAR(50) NOT NULL,
-# 	"Content"	text,
-# 	"ImageLink"	VARCHAR(255),
-# 	PRIMARY KEY("BookId" AUTOINCREMENT),
-# 	FOREIGN KEY("SectionId") REFERENCES "Section"("SectionId")
-# );
-
-
-
-# book = Book.query.all()
-# print(Section.query.all())
-
-## This is Sample I created to learn sql lite connectivity
-# class Book(db.Model):
-#     __tablename__ = 'book'
-#     ID = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     Name = db.Column(db.String, unique=True, nullable=False)
-#     Date_created = db.Column(db.String, nullable=False)
-#     Description = db.Column(db.String)
-
-# parser = reqparse.RequestParser()
-# parser.add_argument('Name')
-# parser.add_argument('Date_created')
-# parser.add_argument('Description')
-
-# class BookAPI(Resource):
-#     def get(self):
-#         book_obj = Book.query.all()
-#         all_book = {}
-#         i = 1
-#         for book in book_obj:
-#             this_book = {}
-#             this_book['ID'] = book.ID
-#             this_book['Name'] = book.Name
-#             this_book['Date_created'] = book.Date_created
-#             this_book['Description'] = book.Description
-#             all_book[f'Book_{i}'] = this_book
-#             i+=1
-#         return all_book
-    
-#     def post(self):
-#         args = parser.parse_args()
-#         new_book = Book(Name = args['Name'], Date_created = args['Date_created'], Description = args['Description'])
-#         db.session.add(new_book)
-#         db.session.commit()
-#         return "Added successfully", 201
-    
-#     def put(self, ID):
-#         to_update = Book.query.get(ID)
-#         args = parser.parse_args()
-#         to_update.Name = args["Name"]
-#         to_update.Date_created = args["Date_created"]
-#         to_update.Description = args["Description"]
-#         db.session.commit()
-#         return f"Updated data for {ID} Successfully"
-
-#     def delete(self, ID):
-#         to_delete = Book.query.get(ID)
-#         db.session.delete(to_delete)
-#         db.session.commit()
-#         return f"Deleted data for {ID} Successfully"
-
-# api.add_resource(BookAPI, "/API/AllBooks", "/API/AddBooks", "/API/<int:ID>/UpdateBooks", "/API/<int:ID>/DeleteBooks")
+print(User.query.all())
 
 
 @app.route("/", methods = ["GET","POST"])
@@ -454,11 +368,13 @@ def librarianLogin():
 
 @app.route("/add-section", methods = ["GET","POST"])
 def addSection():
-    return render_template("add-section.html")
+    section = Section.query.all()
+    return render_template("add-section.html", section = section)
 
 @app.route("/showBooks", methods = ["GET","POST"])
 def showBooks():
-    return render_template("showBooks.html")
+    books = Books.query.all()
+    return render_template("showBooks.html", books=books)
 
 # @app.route("/adminLogin", methods = ["GET","POST"])
 # def admin():

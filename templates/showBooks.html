@@ -12,11 +12,12 @@
       {% include 'header.html' %}
       <div>
         <div class="main-container">
+          {% for book in books %}
           <div class="section-container" id="1">
-            <h2>History Book class 10</h2>
-            <p>Book Author : John Doe</p>
+            <h2>{{book.BookId}} {{book.Title}}</h2>
+            <p>Book Author : {{book.Author}}</p>
             <div>
-              <p>Book Section : History</p>
+              <p>Book Section : {{book.SectionId}}</p>
             </div>
             <button type="button" id="showBook" class="btn btn-outline-primary">
               Show
@@ -31,7 +32,8 @@
             <button type="button" class="btn btn-outline-danger">Delete</button>
           </div>
           {% include 'editBookPopup.html' %} {% include 'showBookPopup.html' %}
-          <div class="section-container" id="1">
+          {% endfor %}
+          <!-- <div class="section-container" id="1">
             <h2>History Book class 11</h2>
             <p>Book Author : John Doe</p>
             <div>
@@ -91,7 +93,7 @@
             </button>
             <button type="button" class="btn btn-outline-danger">Delete</button>
           </div>
-        </div>
+        </div> -->
       </div>
       {% include 'footer.html' %}
     </div>
