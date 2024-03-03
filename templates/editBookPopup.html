@@ -1,4 +1,4 @@
-<div id="editBooksPopup" class="popup">
+<div id="editBooksPopup{{book.BookId}}" class="popup">
   <div class="popup-content">
     <h1>Add Books</h1>
     <div>
@@ -19,7 +19,9 @@
     </div>
     <div class="buttons">
       <button class="btn btn-outline-primary">save</button>
-      <button class="btn btn-primary" id="closeEditBooksPopup">Close</button>
+      <button class="btn btn-primary" id="closeEditBooksPopup{{book.BookId}}">
+        Close
+      </button>
     </div>
   </div>
 </div>

@@ -349,9 +349,6 @@ class BookIssueApi(Resource):
             return f"No issue found with {issue_id}",400
 
 api.add_resource(BookIssueApi,"/API/BookIssue","/API/BookIssue/<int:issue_id>")
-            
-
-print(User.query.all())
 
 
 @app.route("/", methods = ["GET","POST"])

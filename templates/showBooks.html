@@ -19,107 +19,67 @@
             <div>
               <p>Book Section : {{book.SectionId}}</p>
             </div>
-            <button type="button" id="showBook" class="btn btn-outline-primary">
+            <button type="button" id="showBook{{book.BookId}}" class="btn btn-outline-primary">
               Show
             </button>
             <button
               type="button"
-              id="editBooks"
+              id="editBooks{{book.BookId}}"
               class="btn btn-outline-secondary"
             >
               Edit
             </button>
             <button type="button" class="btn btn-outline-danger">Delete</button>
           </div>
-          {% include 'editBookPopup.html' %} {% include 'showBookPopup.html' %}
+          {% include 'editBookPopup.html' %} 
+          <div id="showBooksPopup{{book.BookId}}" class="popup">
+  <div class="popup-content">
+    <h1>History Book class 10</h1>
+    <div id="current-section">
+      <h4>Book Author : John Doe</h4>
+      <h4>Book Section : History</h4>
+      <h4>Link : www.demo.com/placeholder</h4>
+      <div class="buttons">
+        <button class="btn btn-outline-primary">save</button>
+        <button class="btn btn-primary" id="closeShowBooksPopup{{book.BookId}}">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
           {% endfor %}
-          <!-- <div class="section-container" id="1">
-            <h2>History Book class 11</h2>
-            <p>Book Author : John Doe</p>
-            <div>
-              <p>Book Section : History</p>
-            </div>
-            <button type="button" class="btn btn-outline-primary">Show</button>
-            <button type="button" class="btn btn-outline-secondary">
-              Edit
-            </button>
-            <button type="button" class="btn btn-outline-danger">Delete</button>
-          </div>
-          <div class="section-container" id="1">
-            <h2>History Book class 11</h2>
-            <p>Book Author : John Doe</p>
-            <div>
-              <p>Book Section : History</p>
-            </div>
-            <button type="button" class="btn btn-outline-primary">Show</button>
-            <button type="button" class="btn btn-outline-secondary">
-              Edit
-            </button>
-            <button type="button" class="btn btn-outline-danger">Delete</button>
-          </div>
-          <div class="section-container" id="1">
-            <h2>History Book class 11</h2>
-            <p>Book Author : John Doe</p>
-            <div>
-              <p>Book Section : History</p>
-            </div>
-            <button type="button" class="btn btn-outline-primary">Show</button>
-            <button type="button" class="btn btn-outline-secondary">
-              Edit
-            </button>
-            <button type="button" class="btn btn-outline-danger">Delete</button>
-          </div>
-          <div class="section-container" id="1">
-            <h2>History Book class 11</h2>
-            <p>Book Author : John Doe</p>
-            <div>
-              <p>Book Section : History</p>
-            </div>
-            <button type="button" class="btn btn-outline-primary">Show</button>
-            <button type="button" class="btn btn-outline-secondary">
-              Edit
-            </button>
-            <button type="button" class="btn btn-outline-danger">Delete</button>
-          </div>
-          <div class="section-container" id="1">
-            <h2>History Book class 11</h2>
-            <p>Book Author : John Doe</p>
-            <div>
-              <p>Book Section : History</p>
-            </div>
-            <button type="button" class="btn btn-outline-primary">Show</button>
-            <button type="button" class="btn btn-outline-secondary">
-              Edit
-            </button>
-            <button type="button" class="btn btn-outline-danger">Delete</button>
-          </div>
-        </div> -->
       </div>
       {% include 'footer.html' %}
     </div>
     <script>
-      showBook.addEventListener("click", function () {
-        showBooksPopup.classList.add("show");
-      });
-      closeShowBooksPopup.addEventListener("click", function () {
-        showBooksPopup.classList.remove("show");
-      });
-      window.addEventListener("click", function (event) {
-        if (event.target == showBooksPopup) {
-          showBooksPopup.classList.remove("show");
+      const mainContainer = document.querySelector(".main-container");
+
+      mainContainer.addEventListener("click", function (event) {
+        if (event.target.matches('[id^="showBook"]')) {
+          const sectionId = event.target.id.replace("showBook", "");
+          const popupId = `showBooksPopup${sectionId}`;
+          const showBooksPopup = document.getElementById(popupId);
+          if (showBooksPopup) {
+            showBooksPopup.classList.toggle("show");
+          }
         }
       });
 
-      editBooks.addEventListener("click", function () {
-        editBooksPopup.classList.add("show");
-      });
-      closeEditBooksPopup.addEventListener("click", function () {
-        editBooksPopup.classList.remove("show");
-      });
-      window.addEventListener("click", function (event) {
-        if (event.target == editBooksPopup) {
-          editBooksPopup.classList.remove("show");
-        }
+      const closeShowBooksPopups = document.querySelectorAll(
+        '[id^="closeShowBooksPopup"]'
+      );
+
+      closeShowBooksPopups.forEach(function (closeButton) {
+        closeButton.addEventListener("click", function () {
+          const showBooksPopup =
+            closeButton.parentElement.parentElement.parentElement;
+
+          if (showBooksPopup) {
+            showBooksPopup.classList.remove("show");
+          }
+        });
       });
     </script>
   </body>

@@ -1,4 +1,4 @@
-<div id="addBookPopup" class="popup">
+<div id="addBookPopup{{ sec.SectionId }}" class="popup">
   <div class="popup-content">
     <h1>Add Books</h1>
     <div>
@@ -15,11 +15,13 @@
     </div>
     <div>
       <h4>Book Section :</h4>
-      <p id="current-section">History Seciton 1</p>
+      <p id="current-section">{{ sec.Title }} Section</p>
     </div>
     <div class="buttons">
       <button class="btn btn-outline-primary">save</button>
-      <button class="btn btn-primary" id="closeBookPopup">Close</button>
+      <button class="btn btn-primary" id="closeBookPopup{{ sec.SectionId }}">
+        Close
+      </button>
     </div>
   </div>
 </div>

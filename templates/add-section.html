@@ -58,183 +58,38 @@
               Add Books
             </button>
           </div>
-          {% include 'addBookPopup.html' %} {% endfor %}
+          <div id="addBookPopup{{ sec.SectionId }}" class="popup">
+            <div class="popup-content">
+              <h1>Add Books</h1>
+              <div>
+                <h4>Book Title :</h4>
+                <input type="text" placeholder="Book Name" />
+              </div>
+              <div>
+                <h4>Author :</h4>
+                <input type="text" placeholder="Author Name" />
+              </div>
+              <div>
+                <h4>Content :</h4>
+                <input type="text" placeholder="Link" />
+              </div>
+              <div>
+                <h4>Book Section :</h4>
+                <p id="current-section">{{ sec.Title }} Section</p>
+              </div>
+              <div class="buttons">
+                <button class="btn btn-outline-primary">save</button>
+                <button
+                  class="btn btn-primary"
+                  id="closeBookPopup{{ sec.SectionId }}"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
         </div>
-        <!-- 
-        <div class="main-container">
-          {% for sec in section %}
-          <div class="section-container" id="{{ sec.SectionId }}">
-            <h2>{{ sec.SectionId }} {{ sec.Title }}</h2>
-            <p>Date Created: {{ sec.CreatedDate }}</p>
-            <div>
-              <p>Description</p>
-              <p>{{ sec.Description }}</p>
-            </div>
-            <button type="button" id="addBook" class="btn btn-primary">
-              Add Books
-            </button>
-          </div>
-
-          {% include 'addBookPopup.html' %} {% endfor %}
-        </div> -->
-
-        <!-- <div class="main-container">
-          <div class="section-container" id="1">
-            <h2>{{section[0].SectionId}} {{section[0].Title}}</h2>
-            <p>Date Created :{{section[0].CreatedDate}}</p>
-            <div>
-              <p>Description</p>
-              <p>{{section[0].Description}}</p>
-            </div>
-            <button type="button" id="addBook" class="btn btn-primary">
-              Add Books
-            </button>
-          </div>
-          {% include 'addBookPopup.html' %}
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-
-          <div class="section-container">
-            <h2>History Section</h2>
-            <p>Date Created : 01/01/2024</p>
-            <div>
-              <p>Description</p>
-              <p>
-                This is just a demo content for the shake of testing. This is
-                just a demo content for the shake of testing. This is just a
-                demo content for the shake of testing.
-              </p>
-            </div>
-            <a href="/add-section/add-books">
-              <button class="btn btn-primary">Add Books</button>
-            </a>
-          </div>
-        </div> -->
       </div>
       {% include 'footer.html' %}
     </div>
@@ -260,16 +115,32 @@
       const formattedDate = d.toLocaleDateString("en-GB", options);
       currentDate.textContent = formattedDate;
 
-      addBook.addEventListener("click", function () {
-        addBookPopup.classList.add("show");
-      });
-      closeBookPopup.addEventListener("click", function () {
-        addBookPopup.classList.remove("show");
-      });
-      window.addEventListener("click", function (event) {
-        if (event.target == addBookPopup) {
-          addBookPopup.classList.remove("show");
+      const mainContainer = document.querySelector(".main-container");
+
+      mainContainer.addEventListener("click", function (event) {
+        if (event.target.matches('[id^="addBook"]')) {
+          const sectionId = event.target.id.replace("addBook", "");
+          const popupId = `addBookPopup${sectionId}`;
+          const addBookPopup = document.getElementById(popupId);
+          if (addBookPopup) {
+            addBookPopup.classList.toggle("show");
+          }
         }
+      });
+
+      const closeBookPopups = document.querySelectorAll(
+        '[id^="closeBookPopup"]'
+      );
+
+      closeBookPopups.forEach(function (closeButton) {
+        closeButton.addEventListener("click", function () {
+          const addBookPopup =
+            closeButton.parentElement.parentElement.parentElement;
+
+          if (addBookPopup) {
+            addBookPopup.classList.remove("show");
+          }
+        });
       });
 
       document.getElementById("1").addEventListener("click", function (event) {
