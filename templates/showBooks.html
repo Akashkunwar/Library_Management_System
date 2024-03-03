@@ -19,7 +19,11 @@
             <div>
               <p>Book Section : {{book.SectionId}}</p>
             </div>
-            <button type="button" id="showBook{{book.BookId}}" class="btn btn-outline-primary">
+            <button
+              type="button"
+              id="showBook{{book.BookId}}"
+              class="btn btn-outline-primary"
+            >
               Show
             </button>
             <button
@@ -31,31 +35,14 @@
             </button>
             <button type="button" class="btn btn-outline-danger">Delete</button>
           </div>
-          {% include 'editBookPopup.html' %} 
-          <div id="showBooksPopup{{book.BookId}}" class="popup">
-  <div class="popup-content">
-    <h1>History Book class 10</h1>
-    <div id="current-section">
-      <h4>Book Author : John Doe</h4>
-      <h4>Book Section : History</h4>
-      <h4>Link : www.demo.com/placeholder</h4>
-      <div class="buttons">
-        <button class="btn btn-outline-primary">save</button>
-        <button class="btn btn-primary" id="closeShowBooksPopup{{book.BookId}}">
-          Close
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
+          {% include 'editBookPopup.html' %} {% include 'showBookPopup.html' %}
           {% endfor %}
+        </div>
+        {% include 'footer.html' %}
       </div>
-      {% include 'footer.html' %}
     </div>
     <script>
       const mainContainer = document.querySelector(".main-container");
-
       mainContainer.addEventListener("click", function (event) {
         if (event.target.matches('[id^="showBook"]')) {
           const sectionId = event.target.id.replace("showBook", "");
@@ -64,22 +51,26 @@
           if (showBooksPopup) {
             showBooksPopup.classList.toggle("show");
           }
-        }
-      });
-
-      const closeShowBooksPopups = document.querySelectorAll(
-        '[id^="closeShowBooksPopup"]'
-      );
-
-      closeShowBooksPopups.forEach(function (closeButton) {
-        closeButton.addEventListener("click", function () {
-          const showBooksPopup =
-            closeButton.parentElement.parentElement.parentElement;
-
-          if (showBooksPopup) {
-            showBooksPopup.classList.remove("show");
+        } else if (event.target.matches('[id^="closeShowBooksPopup"]')) {
+          const closeButton = event.target;
+          const popup = closeButton.closest(".popup");
+          if (popup) {
+            popup.classList.remove("show");
           }
-        });
+        } else if (event.target.matches('[id^="editBooks"]')) {
+          const sectionId = event.target.id.replace("editBooks", "");
+          const popupId = `editBooksPopup${sectionId}`;
+          const editBooksPopup = document.getElementById(popupId);
+          if (editBooksPopup) {
+            editBooksPopup.classList.toggle("show");
+          }
+        } else if (event.target.matches('[id^="closeEditBooksPopup"]')) {
+          const closeButton = event.target;
+          const popup = closeButton.closest(".popup");
+          if (popup) {
+            popup.classList.remove("show");
+          }
+        }
       });
     </script>
   </body>
