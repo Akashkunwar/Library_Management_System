@@ -395,8 +395,8 @@ def showBooks():
 #     book = Book.query.all()
 #     return render_template("home.html", book=book)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
 
 
 
