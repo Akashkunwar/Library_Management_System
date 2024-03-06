@@ -1,6 +1,6 @@
 import os
 import datetime
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse
 
@@ -365,13 +365,30 @@ def librarianLogin():
 
 @app.route("/add-section", methods = ["GET","POST"])
 def addSection():
-    section = Section.query.all()
-    return render_template("add-section.html", section = section)
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        section = Section(Title=data['section'], Description=data['text'])
+        db.session.add(section)
+        print(data)
+        section = Section.query.all()
+        return render_template("add-section.html", section = section)
+    else:
+        section = Section.query.all()
+        return render_template("add-section.html", section = section)
+
+@app.route("/add-section/test", methods = ["GET","POST"])
+def addedbooks():
+    data = request.form.to_dict()
+    print(data)
+    books = Books.query.all()
+    return render_template("showBooks.html", books=books)
 
 @app.route("/showBooks", methods = ["GET","POST"])
 def showBooks():
     books = Books.query.all()
     return render_template("showBooks.html", books=books)
+
+
 
 # @app.route("/adminLogin", methods = ["GET","POST"])
 # def admin():
