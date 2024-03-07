@@ -1,6 +1,6 @@
 import os
 import datetime
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse
 
@@ -171,6 +171,7 @@ class Books(db.Model):
     Author = db.Column(db.String(50), nullable=False)
     Content = db.Column(db.Text)
     ImageLink = db.Column(db.String(255))
+
 
 book_parser = reqparse.RequestParser()
 book_parser.add_argument('SectionId', type=int, required=True,help="SectionID is required")
@@ -369,6 +370,7 @@ def addSection():
         data = request.form.to_dict()
         section = Section(Title=data['section'], Description=data['text'])
         db.session.add(section)
+        db.session.commit()
         print(data)
         section = Section.query.all()
         return render_template("add-section.html", section = section)
@@ -376,18 +378,43 @@ def addSection():
         section = Section.query.all()
         return render_template("add-section.html", section = section)
 
-@app.route("/add-section/test", methods = ["GET","POST"])
-def addedbooks():
-    data = request.form.to_dict()
-    print(data)
-    books = Books.query.all()
-    return render_template("showBooks.html", books=books)
+# BookId
+# SectionId
+# Title
+# Author
+# Content
+# ImageLink
 
 @app.route("/showBooks", methods = ["GET","POST"])
 def showBooks():
-    books = Books.query.all()
-    return render_template("showBooks.html", books=books)
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        print(data)
+        books = Books(SectionId = 1,Title=data['Book-Title'],Author=data['Author'],Content=data['Content'])
+        db.session.add(books)
+        db.session.commit()
+        print(data)
+        books = Books.query.all()
+        return render_template("showBooks.html", books=books)
+    else:
+        books = Books.query.all()
+        return render_template("showBooks.html", books=books)
 
+@app.route("/deleteBook/<int:bookId>", methods=["GET", "POST"])
+def deleteBook(bookId):
+    book = Books.query.get(bookId)
+    if book:
+        db.session.delete(book)
+        db.session.commit()
+    return redirect(url_for('showBooks'))
+
+@app.route("/deleteSecion/<int:sectionId>", methods=["GET", "POST"])
+def deleteSection(sectionId):
+    section = Section.query.get(sectionId)
+    if section:
+        db.session.delete(section)
+        db.session.commit()
+    return redirect(url_for('addSection'))
 
 
 # @app.route("/adminLogin", methods = ["GET","POST"])
