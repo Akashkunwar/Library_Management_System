@@ -1,27 +1,32 @@
-<div id="editBooksPopup{{book.BookId}}" class="popup">
+<form
+  id="editBooksPopup{{book.BookId}}"
+  class="popup"
+  action="/updateBooks/{{book.BookId}}"
+  method="post"
+>
   <div class="popup-content">
     <h1>Add Books</h1>
     <div>
       <h4>Book Title :</h4>
-      <input type="text" placeholder="{{book.Title}}" />
+      <input type="text" name="Title" placeholder="{{book.Title}}" />
     </div>
     <div>
       <h4>Author :</h4>
-      <input type="text" placeholder="{{book.Author}}" />
+      <input type="text" name="Author" placeholder="{{book.Author}}" />
     </div>
     <div>
       <h4>Content :</h4>
-      <input type="text" placeholder="Link" />
+      <input type="text" name="Content" placeholder="Link" />
     </div>
     <div>
       <h4>Book Section :</h4>
       <p id="current-section">{{book.SectionId}} History Seciton 1</p>
     </div>
     <div class="buttons">
-      <button class="btn btn-outline-primary">save</button>
+      <button class="btn btn-outline-primary" type="submit">save</button>
       <button class="btn btn-primary" id="closeEditBooksPopup{{book.BookId}}">
         Close
       </button>
     </div>
   </div>
-</div>
+</form>
