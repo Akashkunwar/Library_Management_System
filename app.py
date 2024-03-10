@@ -360,6 +360,10 @@ def home():
 def userLogin():
     return render_template("user-login.html")
 
+@app.route("/register", methods = ["GET","POST"])
+def userRegister():
+    return render_template("user-register.html")
+
 @app.route("/librarian-login", methods = ["GET","POST"])
 def librarianLogin():
     return render_template("librarian-login.html")
@@ -437,13 +441,22 @@ def updateBooks(BooksId):
         books = Books.query.all()
         return render_template("showBooks.html", books=books)
 
+@app.route("/allBooks", methods=["GET","POST"])
+def allBooks():
+    books = Books.query.all()
+    return render_template("allBooks.html", books=books)
+
+@app.route("/allBooks", methods=["GET","POST"])
+def myBooks():
+    return render_template("myBooks.html")
+
 # @app.route("/adminLogin", methods = ["GET","POST"])
 # def admin():
 #     book = Book.query.all()
 #     return render_template("home.html", book=book)
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 
