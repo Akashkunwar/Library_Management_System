@@ -8,19 +8,17 @@
   </head>
   <body>
     <img src="/static/logo.jpg" alt="Logo" />
-    <div class="container">
+    <form class="container" action="/librarian-login" method="post">
       <h2>Librarian Login</h2>
       <div class="username">
         <p>Username</p>
-        <input type="text" placeholder="Username" />
+        <input name="username" type="text" placeholder="Username" />
       </div>
       <div>
         <p>Password</p>
-        <input type="password" placeholder="password" />
+        <input name="password" type="password" placeholder="password" />
       </div>
-      <a href="/librarian-login/login">
-        <button>Login</button>
-      </a>
-    </div>
+      <button type="submit">Login</button>
+    </form>
   </body>
 </html>

@@ -358,7 +358,25 @@ def home():
 
 @app.route("/user-login", methods = ["GET","POST"])
 def userLogin():
-    return render_template("user-login.html")
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        print(data['username'])
+        try:
+            user = User.query.filter_by(UserName=data['username']).first()
+            print("UserName",user.UserName)
+            print("Password",user.Password)
+
+            if user:
+                if user.Password == data["password"]:
+                    return redirect(url_for('allBooks'))
+                else:
+                    return render_template("user-login.html")
+            else:
+                return render_template("user-login.html")
+        except:
+            return render_template("user-login.html")
+    else:
+        return render_template("user-login.html")
 
 @app.route("/register", methods = ["GET","POST"])
 def userRegister():
@@ -366,7 +384,26 @@ def userRegister():
 
 @app.route("/librarian-login", methods = ["GET","POST"])
 def librarianLogin():
-    return render_template("librarian-login.html")
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        print(data)
+        try:
+            user = User.query.filter_by(UserName=data['username']).first()
+            print("UserName",user.UserName)
+            print("Password",user.Password)
+
+            if user:
+                if user.Password == data["password"]:
+                    return redirect(url_for('addSection'))
+                    # return render_template("add-section.html")
+                else:
+                    return render_template("librarian-login.html")
+            else:
+                return render_template("librarian-login.html")
+        except:
+            return render_template("librarian-login.html")
+    else:
+        return render_template("librarian-login.html")
 
 @app.route("/add-section", methods = ["GET","POST"])
 def addSection():
@@ -381,13 +418,6 @@ def addSection():
     else:
         section = Section.query.all()
         return render_template("add-section.html", section = section)
-
-# BookId
-# SectionId
-# Title
-# Author
-# Content
-# ImageLink
 
 @app.route("/showBooks", methods = ["GET","POST"])
 def showBooks():
@@ -428,7 +458,6 @@ def updateBooks(BooksId):
 
     if request.method == 'POST':
         data = request.form.to_dict()
-        print(data)
         book.SectionId = 1
         book.Title = data['Title']
         book.Author = data['Author']
@@ -446,23 +475,9 @@ def allBooks():
     books = Books.query.all()
     return render_template("allBooks.html", books=books)
 
-@app.route("/allBooks", methods=["GET","POST"])
+@app.route("/myBooks", methods=["GET","POST"])
 def myBooks():
     return render_template("myBooks.html")
 
-# @app.route("/adminLogin", methods = ["GET","POST"])
-# def admin():
-#     book = Book.query.all()
-#     return render_template("home.html", book=book)
-
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-# GET /API/AllBooks
-# POST/API/AddBooks
-# PUT /API/<int:ID>/UpdateBooks
-# DELETE /API/<int:ID>/DeleteBooks
