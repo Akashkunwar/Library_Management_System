@@ -9,6 +9,7 @@
   <body>
     <img src="/static/logo.jpg" alt="Logo" />
     <form class="container" action="/user-login" method="post">
+      <p class="error-message">{{error}}</p>
       <h2>User Login</h2>
       <div class="username">
         <p>Username</p>
@@ -19,9 +20,9 @@
         <input type="password" name="password" placeholder="password" />
       </div>
       <button type="submit">Login</button>
-      <a href="/register">
-        <button id="sign-up">Sign Up</button>
-      </a>
     </form>
+    <a href="/register">
+      <button id="sign-up" class="register">Sign Up</button>
+    </a>
   </body>
 </html>

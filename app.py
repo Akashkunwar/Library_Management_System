@@ -370,38 +370,46 @@ def userLogin():
                 if user.Password == data["password"]:
                     return redirect(url_for('allBooks'))
                 else:
-                    return render_template("user-login.html")
+                    return render_template("user-login.html", error="Wrong Password")
             else:
-                return render_template("user-login.html")
+                return render_template("user-login.html", error="No user with this Username")
         except:
-            return render_template("user-login.html")
+            return render_template("user-login.html", error="No user with this Username")
     else:
         return render_template("user-login.html")
 
 @app.route("/register", methods = ["GET","POST"])
 def userRegister():
-    return render_template("user-register.html")
+    if request.method =='POST':
+        data = request.form.to_dict()
+        user = User.query.filter_by(UserName=data['Username']).first()
+        if user:
+            return render_template("user-login.html", error="User already registered please login!")
+        else:
+            user = User(UserName=data['Username'], Password=data['password'], Role='user')
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for('userLogin'))
+    else:
+        return render_template("user-register.html")
 
 @app.route("/librarian-login", methods = ["GET","POST"])
 def librarianLogin():
     if request.method == 'POST':
         data = request.form.to_dict()
-        print(data)
+        # print(data)
         try:
             user = User.query.filter_by(UserName=data['username']).first()
-            print("UserName",user.UserName)
-            print("Password",user.Password)
-
             if user:
                 if user.Password == data["password"]:
                     return redirect(url_for('addSection'))
                     # return render_template("add-section.html")
                 else:
-                    return render_template("librarian-login.html")
+                    return render_template("librarian-login.html", error="Wrong Password")
             else:
-                return render_template("librarian-login.html")
+                return render_template("librarian-login.html", error="No user with this Username")
         except:
-            return render_template("librarian-login.html")
+            return render_template("librarian-login.html", error="No user with this Username")
     else:
         return render_template("librarian-login.html")
 
