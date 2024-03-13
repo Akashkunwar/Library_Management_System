@@ -485,7 +485,8 @@ def allBooks():
 
 @app.route("/myBooks", methods=["GET","POST"])
 def myBooks():
-    return render_template("myBooks.html")
+    books = Books.query.all()
+    return render_template("myBooks.html", books= books)
 
 if __name__ == '__main__':
     app.run(debug=True)
