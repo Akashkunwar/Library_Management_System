@@ -8,24 +8,20 @@
     <h1>Add Books</h1>
     <div>
       <h4>Book Title :</h4>
-      <input type="text" name="Book-Title" placeholder="Book Name" />
+      <input type="text" name="Book-Title" placeholder="Book Name" required />
     </div>
     <div>
       <h4>Author :</h4>
-      <input type="text" name="Author" placeholder="Author Name" />
+      <input type="text" name="Author" placeholder="Author Name" required />
     </div>
     <div>
       <h4>Content :</h4>
-      <input type="text" name="Content" placeholder="Link" />
+      <input type="text" name="Content" placeholder="Link" required />
     </div>
     <div>
       <h4>Book Section :</h4>
-      <input
-        type="hidden"
-        name="book_section"
-        value="{{ sec.Title }} Section"
-      />
-      <p id="current-section">{{ sec.Title }} Section</p>
+      <input type="hidden" name="book_section" value="{{ sec.SectionId }}" />
+      <p id="current-section">{{ sec.SectionId }} Section</p>
     </div>
     <div class="buttons">
       <button class="btn btn-outline-primary" type="submit">save</button>

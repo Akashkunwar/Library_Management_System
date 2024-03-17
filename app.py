@@ -365,10 +365,12 @@ def userLogin():
             user = User.query.filter_by(UserName=data['username']).first()
             print("UserName",user.UserName)
             print("Password",user.Password)
+            print("UserId",user.UserId)
+            userid = user.UserId
 
             if user:
                 if user.Password == data["password"]:
-                    return redirect(url_for('allBooks'))
+                    return redirect(url_for('allBooks', userid = userid))
                 else:
                     return render_template("user-login.html", error="Wrong Password")
             else:
@@ -432,7 +434,7 @@ def showBooks():
     if request.method == 'POST':
         data = request.form.to_dict()
         print(data)
-        books = Books(SectionId = 1,Title=data['Book-Title'],Author=data['Author'],Content=data['Content'])
+        books = Books(SectionId = data['book_section'],Title=data['Book-Title'],Author=data['Author'],Content=data['Content'])
         db.session.add(books)
         db.session.commit()
         print(data)
@@ -478,10 +480,33 @@ def updateBooks(BooksId):
         books = Books.query.all()
         return render_template("showBooks.html", books=books)
 
+#    IssueId
+#     UserId
+#     BookId
+#     SectionId
+#     RequestDate
+#     Days
+#     IssueDate = db.Column(db.String)
+#     IssueStatus = db.Column(db.String, nullable=False)
+#     LastIssueStatusDate = db.Column(db.String)
+
+
 @app.route("/allBooks", methods=["GET","POST"])
 def allBooks():
-    books = Books.query.all()
-    return render_template("allBooks.html", books=books)
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        print(data)
+        requstBook = BookIssue(UserId=data['userid'], BookId=data['bookid'], SectionId=data['sectionId'], Days=data['days'], IssueStatus = 'requested')
+        db.session.add(requstBook)
+        db.session.commit()
+
+        books = Books.query.all()
+        userid = data['userid']
+        return render_template("allBooks.html", books=books, userid = userid)
+    else:
+        books = Books.query.all()
+        userid = request.args.get('userid')
+        return render_template("allBooks.html", books=books, userid = userid)
 
 @app.route("/myBooks", methods=["GET","POST"])
 def myBooks():
