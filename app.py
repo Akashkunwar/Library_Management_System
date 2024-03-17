@@ -496,7 +496,7 @@ def allBooks():
     if request.method == 'POST':
         data = request.form.to_dict()
         print(data)
-        requstBook = BookIssue(UserId=data['userid'], BookId=data['bookid'], SectionId=data['sectionId'], Days=data['days'], IssueStatus = 'requested')
+        requstBook = BookIssue(UserId=data['userid'], BookId=data['bookid'], SectionId=data['sectionId'], Days=data['days'], IssueStatus = 'requested', IssueDate = datetime.datetime.today().date())
         db.session.add(requstBook)
         db.session.commit()
 
