@@ -3,6 +3,7 @@
   class="popup"
   action="/showBooks"
   method="POST"
+  enctype="multipart/form-data"
 >
   <div class="popup-content">
     <h1>Add Books</h1>
@@ -22,6 +23,7 @@
       <h4>Book Section :</h4>
       <input type="hidden" name="book_section" value="{{ sec.SectionId }}" />
       <p id="current-section">{{ sec.SectionId }} Section</p>
+      <input type="file" name="file" />
     </div>
     <div class="buttons">
       <button class="btn btn-outline-primary" type="submit">save</button>

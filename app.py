@@ -3,6 +3,8 @@ import datetime
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse
+from distutils.log import debug 
+from fileinput import filename 
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -431,7 +433,10 @@ def addSection():
 
 @app.route("/showBooks", methods = ["GET","POST"])
 def showBooks():
-    if request.method == 'POST':
+    if request.method == 'POST': 
+        f = request.files['file']
+        file_path = os.path.join("books", f.filename)
+        f.save(file_path) 
         data = request.form.to_dict()
         print(data)
         books = Books(SectionId = data['book_section'],Title=data['Book-Title'],Author=data['Author'],Content=data['Content'])
