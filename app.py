@@ -1,10 +1,11 @@
 import os
 import datetime
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse
 from distutils.log import debug 
 from fileinput import filename 
+from werkzeug.utils import secure_filename
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -434,10 +435,11 @@ def addSection():
 @app.route("/showBooks", methods = ["GET","POST"])
 def showBooks():
     if request.method == 'POST': 
-        f = request.files['file']
-        file_path = os.path.join("books", f.filename)
-        f.save(file_path) 
         data = request.form.to_dict()
+        f = request.files['file']
+        new_filename = data['Book-Title']+"_"+data['Author']+".pdf"
+        file_path = os.path.join("books", new_filename)
+        f.save(file_path) 
         print(data)
         books = Books(SectionId = data['book_section'],Title=data['Book-Title'],Author=data['Author'],Content=data['Content'])
         db.session.add(books)
@@ -485,16 +487,6 @@ def updateBooks(BooksId):
         books = Books.query.all()
         return render_template("showBooks.html", books=books)
 
-#    IssueId
-#     UserId
-#     BookId
-#     SectionId
-#     RequestDate
-#     Days
-#     IssueDate = db.Column(db.String)
-#     IssueStatus = db.Column(db.String, nullable=False)
-#     LastIssueStatusDate = db.Column(db.String)
-
 
 @app.route("/allBooks", methods=["GET","POST"])
 def allBooks():
@@ -517,6 +509,11 @@ def allBooks():
 def myBooks():
     books = Books.query.all()
     return render_template("myBooks.html", books= books)
+
+@app.route('/download-book/<path:filename>')
+def download_book(filename):
+    pdf_path = os.path.join("books", filename)
+    return send_file(pdf_path, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(debug=True)

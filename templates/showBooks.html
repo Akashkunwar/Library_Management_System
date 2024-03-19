@@ -16,6 +16,9 @@
           <div class="section-container" id="1">
             <h2>{{book.BookId}} {{book.Title}}</h2>
             <p>Book Author : {{book.Author}}</p>
+            <p>
+              Book Link : <a href="{{ url_for('download_book', filename=book.Title + '_' + book.Author + '.pdf') }}">Show Book</a>
+            </p>
             <div>
               <p>Book Section : {{book.SectionId}}</p>
             </div>
@@ -33,7 +36,7 @@
             >
               Edit
             </button>
-            
+
             <form
               action="{{ url_for('deleteBook', bookId=book.BookId) }}"
               method="post"
