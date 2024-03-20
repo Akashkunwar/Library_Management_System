@@ -14,13 +14,17 @@
         <div class="main-container">
           {% for book in books %}
           <div class="section-container" id="1">
-            <h2>{{book.BookId}} {{book.Title}}</h2>
-            <p>Book Author : {{book.Author}}</p>
+            <h2>{{book.Books_BookId}} {{book.Books_Title}}</h2>
+            <p>Book Author : {{book.Books_Author}}</p>
             <p>
-              Book Link : <a href="{{ url_for('download_book', filename=book.Title + '_' + book.Author + '.pdf') }}">Show Book</a>
+              Book Link :
+              <a
+                href="{{ url_for('download_book', filename=book.Books_Title + '_' + book.Books_Author + '.pdf') }}"
+                >Show Book</a
+              >
             </p>
             <div>
-              <p>Book Section : {{book.SectionId}}</p>
+              <p>Book Section : {{book.Section_Title}}</p>
             </div>
             <button
               type="button"
@@ -31,14 +35,14 @@
             </button>
             <button
               type="button"
-              id="editBooks{{book.BookId}}"
+              id="editBooks{{book.Books_BookId}}"
               class="btn btn-outline-secondary"
             >
               Edit
             </button>
 
             <form
-              action="{{ url_for('deleteBook', bookId=book.BookId) }}"
+              action="{{ url_for('deleteBook', bookId=book.Books_BookId) }}"
               method="post"
               style="display: inline"
             >

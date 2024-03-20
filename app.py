@@ -175,7 +175,6 @@ class Books(db.Model):
     Content = db.Column(db.Text)
     ImageLink = db.Column(db.String(255))
 
-
 book_parser = reqparse.RequestParser()
 book_parser.add_argument('SectionId', type=int, required=True,help="SectionID is required")
 book_parser.add_argument('Title', type=str, required=True,help="Title is required")
@@ -252,7 +251,6 @@ class BooksAPI(Resource):
 
 api.add_resource(BooksAPI,"/API/Books", "/API/Books/<int:book_id>")
 
-
 class BookIssue(db.Model):
     __tablename__ = 'BookIssue'
     IssueId = db.Column(db.Integer, autoincrement=True, primary_key=True)
@@ -264,7 +262,7 @@ class BookIssue(db.Model):
     IssueDate = db.Column(db.String)
     IssueStatus = db.Column(db.String, nullable=False)
     LastIssueStatusDate = db.Column(db.String)
-
+    
 BookIssue_parser = reqparse.RequestParser()
 BookIssue_parser.add_argument('UserId', type=int, required=True, help='UserId is required')
 BookIssue_parser.add_argument('BookId', type=int, required=True, help='BookId is required')
@@ -273,7 +271,6 @@ BookIssue_parser.add_argument('Days', type=int, required=True, help='Days is req
 BookIssue_parser.add_argument('IssueDate', type=str)
 BookIssue_parser.add_argument('IssueStatus', type=str, required=True, help='IssueStatus is required')
 BookIssue_parser.add_argument('LastIssueStatusDate', type=str)
-
 
 class BookIssueApi(Resource):
     def get(self, issue_id=None):
@@ -354,6 +351,34 @@ class BookIssueApi(Resource):
 
 api.add_resource(BookIssueApi,"/API/BookIssue","/API/BookIssue/<int:issue_id>")
 
+class BookIssueMerge(db.Model):
+    __tablename__ = 'book_issue_merge'
+    IssueId = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    UserId = db.Column(db.Integer, db.ForeignKey(User.UserId), nullable=False)
+    BookId = db.Column(db.Integer, db.ForeignKey(Books.BookId), nullable=False)
+    SectionId = db.Column(db.Integer, db.ForeignKey(Section.SectionId), nullable=False)
+    RequestDate = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    Days = db.Column(db.Integer, nullable=False)
+    IssueDate = db.Column(db.String)
+    IssueStatus = db.Column(db.String, nullable=False)
+    LastIssueStatusDate = db.Column(db.String)
+    Book_Title = db.Column(db.String(50), nullable=False)
+    Author = db.Column(db.String(50), nullable=False)
+    UserName = db.Column(db.String(20), unique=True, nullable=False)
+    Section_Title = db.Column(db.String(50), nullable=False)
+
+class BookSection(db.Model):
+    __tablename__ = 'book_section'
+    Books_BookId = db.Column(db.Integer, primary_key=True, nullable=False)
+    Section_SectionId = db.Column(db.Integer, db.ForeignKey(Section.SectionId), nullable=False)
+    Section_Title = db.Column(db.String(50), nullable=False)
+    Section_CreatedDate = db.Column(db.DateTime, nullable=False, default=datetime.datetime.utcnow)
+    Section_Description = db.Column(db.Text, nullable=False)
+    Section_ImageLink = db.Column(db.String(255))
+    Books_Title = db.Column(db.String(50), nullable=False)
+    Books_Author = db.Column(db.String(50), nullable=False)
+    Books_Content = db.Column(db.Text)
+    Books_ImageLink = db.Column(db.String(255))
 
 @app.route("/", methods = ["GET","POST"])
 def home():
@@ -445,11 +470,11 @@ def showBooks():
         db.session.add(books)
         db.session.commit()
         print(data)
-        books = Books.query.all()
-        return render_template("showBooks.html", books=books)
+        bookSec = BookSection.query.all()
+        return render_template("showBooks.html", books=bookSec)
     else:
-        books = Books.query.all()
-        return render_template("showBooks.html", books=books)
+        bookSec = BookSection.query.all()
+        return render_template("showBooks.html", books=bookSec)
 
 @app.route("/deleteBook/<int:bookId>", methods=["GET", "POST"])
 def deleteBook(bookId):
@@ -486,7 +511,6 @@ def updateBooks(BooksId):
     else:
         books = Books.query.all()
         return render_template("showBooks.html", books=books)
-
 
 @app.route("/allBooks", methods=["GET","POST"])
 def allBooks():
