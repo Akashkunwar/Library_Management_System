@@ -1,0 +1,7 @@
+- Dark light mode
+- Login sessions
+- Don't send on login page once login after going back
+# In book edit section while clicking close popup it save blank
+# save link of file in column
+- Create Graph page
+- Create My books page with requested, current and completed books

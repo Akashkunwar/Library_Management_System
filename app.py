@@ -462,11 +462,11 @@ def showBooks():
     if request.method == 'POST': 
         data = request.form.to_dict()
         f = request.files['file']
-        new_filename = data['Book-Title']+"_"+data['Author']+".pdf"
+        new_filename = (data['Book-Title']+"_"+data['Author']+".pdf").replace(" ","_")
         file_path = os.path.join("books", new_filename)
         f.save(file_path) 
         print(data)
-        books = Books(SectionId = data['book_section'],Title=data['Book-Title'],Author=data['Author'],Content=data['Content'])
+        books = Books(SectionId = data['book_section'],Title=data['Book-Title'],Author=data['Author'],Content=data['Content'], ImageLink=new_filename)
         db.session.add(books)
         db.session.commit()
         print(data)
@@ -480,6 +480,10 @@ def showBooks():
 def deleteBook(bookId):
     book = Books.query.get(bookId)
     if book:
+        print(book.ImageLink)
+        file_path = os.path.join("books", book.ImageLink)
+        if os.path.exists(file_path):
+            os.remove(file_path)
         db.session.delete(book)
         db.session.commit()
     return redirect(url_for('showBooks'))
