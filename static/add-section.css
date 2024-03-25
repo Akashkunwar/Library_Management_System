@@ -22,12 +22,6 @@ body {
   margin-right: 10px;
 }
 
-h3 {
-  padding-top: 90px;
-  padding-left: 100px;
-  margin-bottom: -115px !important;
-}
-
 .second {
   margin-top: -200px;
 }
@@ -39,7 +33,7 @@ h3 {
   align-items: flex-start;
   gap: 2em;
   margin: 20px;
-  margin-bottom: 50px;
+  /* margin-bottom: 50px; */
 }
 
 .section-container {
@@ -51,6 +45,17 @@ h3 {
   text-align: center;
   width: 20%;
   flex-grow: 1;
+}
+
+.firstHeading {
+  padding-top: 90px;
+  padding-left: 100px;
+  margin-bottom: -115px !important;
+}
+
+h3 {
+  padding-left: 100px;
+  margin-bottom: -115px !important;
 }
 
 header {

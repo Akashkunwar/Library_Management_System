@@ -366,6 +366,7 @@ class BookIssueMerge(db.Model):
     Author = db.Column(db.String(50), nullable=False)
     UserName = db.Column(db.String(20), unique=True, nullable=False)
     Section_Title = db.Column(db.String(50), nullable=False)
+    Book_Link = db.Column(db.String(50), nullable=False)
 
 class BookSection(db.Model):
     __tablename__ = 'book_section'
@@ -525,18 +526,66 @@ def allBooks():
         db.session.add(requstBook)
         db.session.commit()
 
+        bookSec = BookSection.query.all()
         books = Books.query.all()
         userid = data['userid']
-        return render_template("allBooks.html", books=books, userid = userid)
+        return render_template("allBooks.html", books=bookSec, userid = userid)
     else:
-        books = Books.query.all()
+        bookSec = BookSection.query.all()
+        # books = Books.query.all()
         userid = request.args.get('userid')
-        return render_template("allBooks.html", books=books, userid = userid)
+        return render_template("allBooks.html", books=bookSec, userid = userid)
 
 @app.route("/myBooks", methods=["GET","POST"])
 def myBooks():
     books = Books.query.all()
     return render_template("myBooks.html", books= books)
+
+@app.route("/requestedBooks", methods=["GET","POST"])
+def requestedBooks():
+    if request.method == "POST":
+        data = request.form.to_dict()
+        Issue_id = int(data["id"])
+        Issue_status = data['status']
+    
+        book_issue = BookIssue.query.get(Issue_id)
+        if book_issue:
+            book_issue.IssueStatus = Issue_status
+            db.session.commit()
+
+            return redirect(url_for('requestedBooks'))
+            # BookIssueMergeTable = BookIssueMerge.query.filter(
+            #     BookIssueMerge.Section_Title.isnot(None),
+            #     BookIssueMerge.Author.isnot(None),
+            #     BookIssueMerge.Book_Title.isnot(None),
+            #     BookIssueMerge.IssueStatus == "requested",
+            #     BookIssueMerge.UserName.isnot(None)).all()
+            # bookSec = BookSection.query.all()
+        
+
+    BookIssueMergeTable = BookIssueMerge.query.filter(
+        BookIssueMerge.Section_Title.isnot(None),
+        BookIssueMerge.Author.isnot(None),
+        BookIssueMerge.Book_Title.isnot(None),
+        BookIssueMerge.IssueStatus == "requested",
+        BookIssueMerge.UserName.isnot(None)).all()
+    
+    ApprovedBookIssueMergeTable = BookIssueMerge.query.filter(
+        BookIssueMerge.Section_Title.isnot(None),
+        BookIssueMerge.Author.isnot(None),
+        BookIssueMerge.Book_Title.isnot(None),
+        BookIssueMerge.IssueStatus == "Approved",
+        BookIssueMerge.UserName.isnot(None)).all()
+    
+    RejectedBookIssueMergeTable = BookIssueMerge.query.filter(
+        BookIssueMerge.Section_Title.isnot(None),
+        BookIssueMerge.Author.isnot(None),
+        BookIssueMerge.Book_Title.isnot(None),
+        BookIssueMerge.IssueStatus == "Rejected",
+        BookIssueMerge.UserName.isnot(None)).all()
+    
+    # bookSec = BookSection.query.all()
+    return render_template("requestBooks.html", books=BookIssueMergeTable, approvedBooks = ApprovedBookIssueMergeTable, rejectedBooks = RejectedBookIssueMergeTable)
 
 @app.route('/download-book/<path:filename>')
 def download_book(filename):
