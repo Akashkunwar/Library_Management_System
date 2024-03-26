@@ -10,3 +10,5 @@
     - Admin graph with (total user, admin, books, total issued, returned, requested, rejected)
 # Create Request books page with requested, Accept and Rejected books
 # Create My books page with requested, current and completed books
+- While opening books from section it shows all books in every secion
+- While editing i think it set section to 1 for all books
