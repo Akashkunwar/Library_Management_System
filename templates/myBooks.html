@@ -11,49 +11,117 @@
     <div>
       {% include 'header.html' %}
       <div>
-        <h3>Issued Books</h3>
+        <h3 class="firstHeading">Currently Issued Books</h3>
         <div class="main-container">
-          {% for book in books %}
+          {% for book in approvedBooks %}
           <div class="section-container" id="1">
-            <h2>{{book.BookId}} {{book.Title}}</h2>
+            <h2>Book Name : {{book.Book_Title}}</h2>
+            <p>Request Date : {{book.RequestDate}}</p>
             <p>Book Author : {{book.Author}}</p>
+            <p>Request Days : {{book.Days}}</p>
+            <p>
+              Book Link :
+              <a href="{{ url_for('download_book', filename=book.Book_Link) }}"
+                >Show Book</a
+              >
+            </p>
             <div>
-              <p>Book Section : {{book.SectionId}}</p>
+              <p>Book Section : {{book.Section_Title}}</p>
             </div>
-            <button
-              type="button"
-              id="request{{book.BookId}}"
-              class="btn btn-outline-warning"
-            >
-              Return
-            </button>
+
+            <form action="/myBooks" method="post" style="display: inline">
+              <input type="hidden" name="id" value="{{book.IssueId}}" />
+              <input type="hidden" name="status" value="Expired" />
+              <button type="submit" class="btn btn-dark">Return</button>
+            </form>
           </div>
-          {% include 'editBookPopup.html' %} {% include 'showBookPopup.html' %}
           {% endfor %}
         </div>
 
-        <h3 class="second">Completed Books</h3>
+        <h3>Completed Books</h3>
         <div class="main-container">
-          {% for book in books %}
+          {% for book in expiredBooks %}
           <div class="section-container" id="1">
-            <h2>{{book.BookId}} {{book.Title}}</h2>
+            <h2>Book Name : {{book.Book_Title}}</h2>
+            <p>Request Date : {{book.RequestDate}}</p>
             <p>Book Author : {{book.Author}}</p>
+            <p>Request Days : {{book.Days}}</p>
             <div>
-              <p>Book Section : {{book.SectionId}}</p>
+              <p>Book Section : {{book.Section_Title}}</p>
             </div>
-            <button
-              type="button"
-              id="request{{book.BookId}}"
-              class="btn btn-outline-success"
-            >
-              Show
-            </button>
           </div>
-          {% include 'editBookPopup.html' %} {% include 'showBookPopup.html' %}
+          {% endfor %}
+        </div>
+        <h3>Requested Books</h3>
+        <div class="main-container">
+          {% for book in issueBooks %}
+          <div class="section-container" id="1">
+            <h2>Book Name : {{book.Book_Title}}</h2>
+            <p>Request Date : {{book.RequestDate}}</p>
+            <p>Book Author : {{book.Author}}</p>
+            <p>Request Days : {{book.Days}}</p>
+            <div>
+              <p>Book Section : {{book.Section_Title}}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <h3>Request Rejected Books</h3>
+        <div class="main-container">
+          {% for book in rejectedBooks %}
+          <div class="section-container" id="1">
+            <h2>Book Name : {{book.Book_Title}}</h2>
+            <p>Request Date : {{book.RequestDate}}</p>
+            <p>Book Author : {{book.Author}}</p>
+            <p>Request Days : {{book.Days}}</p>
+            <div>
+              <p>Book Section : {{book.Section_Title}}</p>
+            </div>
+
+            <form action="/myBooks" method="post" style="display: inline">
+              <input type="hidden" name="id" value="{{book.IssueId}}" />
+              <input type="hidden" name="status" value="requested" />
+              <button type="submit" class="btn btn-primary">
+                Request Again
+              </button>
+            </form>
+          </div>
           {% endfor %}
         </div>
         {% include 'footer.html' %}
       </div>
     </div>
+    <!-- <script>
+      const mainContainer = document.querySelector(".main-container");
+      mainContainer.addEventListener("click", function (event) {
+        if (event.target.matches('[id^="showBook"]')) {
+          const sectionId = event.target.id.replace("showBook", "");
+          const popupId = `showBooksPopup${sectionId}`;
+          const showBooksPopup = document.getElementById(popupId);
+          if (showBooksPopup) {
+            showBooksPopup.classList.toggle("show");
+          }
+        } else if (event.target.matches('[id^="closeShowBooksPopup"]')) {
+          const closeButton = event.target;
+          const popup = closeButton.closest(".popup");
+          if (popup) {
+            popup.classList.remove("show");
+          }
+        } else if (event.target.matches('[id^="editBooks"]')) {
+          const sectionId = event.target.id.replace("editBooks", "");
+          const popupId = `editBooksPopup${sectionId}`;
+          const editBooksPopup = document.getElementById(popupId);
+          if (editBooksPopup) {
+            editBooksPopup.classList.toggle("show");
+          }
+        } else if (event.target.matches('[id^="closeEditBooksPopup"]')) {
+          const closeButton = event.target;
+          const popup = closeButton.closest(".popup");
+          if (popup) {
+            popup.classList.remove("show");
+          }
+        }
+      });
+    </script> -->
   </body>
 </html>

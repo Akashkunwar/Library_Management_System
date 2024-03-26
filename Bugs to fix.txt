@@ -1,8 +1,12 @@
+
+
 - Dark light mode
-- Login sessions
+# Login sessions
 - Don't send on login page once login after going back
 # In book edit section while clicking close popup it save blank
 # save link of file in column
 - Create Graph page
+    - Create User Graph with (Total, issued,returned,requested,rejected)
+    - Admin graph with (total user, admin, books, total issued, returned, requested, rejected)
 # Create Request books page with requested, Accept and Rejected books
-- Create My books page with requested, current and completed books
+# Create My books page with requested, current and completed books

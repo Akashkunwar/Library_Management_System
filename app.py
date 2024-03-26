@@ -1,6 +1,6 @@
 import os
 import datetime
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse
 from distutils.log import debug 
@@ -9,6 +9,8 @@ from werkzeug.utils import secure_filename
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
+
+app.secret_key = 'B00KL1BRARYS4S7EM'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///"+os.path.join(current_dir,"library.db")
 db = SQLAlchemy()
@@ -389,16 +391,15 @@ def home():
 def userLogin():
     if request.method == 'POST':
         data = request.form.to_dict()
-        print(data['username'])
+        # print(data['username'])
         try:
             user = User.query.filter_by(UserName=data['username']).first()
-            print("UserName",user.UserName)
-            print("Password",user.Password)
-            print("UserId",user.UserId)
             userid = user.UserId
 
             if user:
                 if user.Password == data["password"]:
+                    print(user.UserId)
+                    session['user_id'] = user.UserId
                     return redirect(url_for('allBooks', userid = userid))
                 else:
                     return render_template("user-login.html", error="Wrong Password")
@@ -538,8 +539,52 @@ def allBooks():
 
 @app.route("/myBooks", methods=["GET","POST"])
 def myBooks():
-    books = Books.query.all()
-    return render_template("myBooks.html", books= books)
+    print(session['user_id'])
+    if request.method == "POST":
+        data = request.form.to_dict()
+        Issue_id = int(data["id"])
+        Issue_status = data['status']
+
+        book_issue = BookIssue.query.get(Issue_id)
+        if book_issue:
+            book_issue.IssueStatus = Issue_status
+            db.session.commit()
+            return redirect(url_for('myBooks'))
+
+    BookIssueMergeTable = BookIssueMerge.query.filter(
+        BookIssueMerge.UserId == session['user_id'],
+        BookIssueMerge.Section_Title.isnot(None),
+        BookIssueMerge.Author.isnot(None),
+        BookIssueMerge.Book_Title.isnot(None),
+        BookIssueMerge.IssueStatus == "requested",
+        BookIssueMerge.UserName.isnot(None)).all()
+    
+    ApprovedBookIssueMergeTable = BookIssueMerge.query.filter(
+        BookIssueMerge.UserId == session['user_id'],
+        BookIssueMerge.Section_Title.isnot(None),
+        BookIssueMerge.Author.isnot(None),
+        BookIssueMerge.Book_Title.isnot(None),
+        BookIssueMerge.IssueStatus == "Approved",
+        BookIssueMerge.UserName.isnot(None)).all()
+    
+    RejectedBookIssueMergeTable = BookIssueMerge.query.filter(
+        BookIssueMerge.UserId == session['user_id'],
+        BookIssueMerge.Section_Title.isnot(None),
+        BookIssueMerge.Author.isnot(None),
+        BookIssueMerge.Book_Title.isnot(None),
+        BookIssueMerge.IssueStatus == "Rejected",
+        BookIssueMerge.UserName.isnot(None)).all()
+    
+    ExpiredBookIssueMergeTable = BookIssueMerge.query.filter(
+        BookIssueMerge.UserId == session['user_id'],
+        BookIssueMerge.Section_Title.isnot(None),
+        BookIssueMerge.Author.isnot(None),
+        BookIssueMerge.Book_Title.isnot(None),
+        BookIssueMerge.IssueStatus == "Expired",
+        BookIssueMerge.UserName.isnot(None)).all()
+    
+    return render_template("myBooks.html", approvedBooks = ApprovedBookIssueMergeTable, rejectedBooks = RejectedBookIssueMergeTable, issueBooks = BookIssueMergeTable,
+    expiredBooks = ExpiredBookIssueMergeTable)
 
 @app.route("/requestedBooks", methods=["GET","POST"])
 def requestedBooks():
@@ -547,20 +592,12 @@ def requestedBooks():
         data = request.form.to_dict()
         Issue_id = int(data["id"])
         Issue_status = data['status']
-    
+
         book_issue = BookIssue.query.get(Issue_id)
         if book_issue:
             book_issue.IssueStatus = Issue_status
             db.session.commit()
-
             return redirect(url_for('requestedBooks'))
-            # BookIssueMergeTable = BookIssueMerge.query.filter(
-            #     BookIssueMerge.Section_Title.isnot(None),
-            #     BookIssueMerge.Author.isnot(None),
-            #     BookIssueMerge.Book_Title.isnot(None),
-            #     BookIssueMerge.IssueStatus == "requested",
-            #     BookIssueMerge.UserName.isnot(None)).all()
-            # bookSec = BookSection.query.all()
         
 
     BookIssueMergeTable = BookIssueMerge.query.filter(
@@ -584,7 +621,6 @@ def requestedBooks():
         BookIssueMerge.IssueStatus == "Rejected",
         BookIssueMerge.UserName.isnot(None)).all()
     
-    # bookSec = BookSection.query.all()
     return render_template("requestBooks.html", books=BookIssueMergeTable, approvedBooks = ApprovedBookIssueMergeTable, rejectedBooks = RejectedBookIssueMergeTable)
 
 @app.route('/download-book/<path:filename>')
