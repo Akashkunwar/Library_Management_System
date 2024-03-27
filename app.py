@@ -1,3 +1,4 @@
+# from crypt import methods
 import os
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash
@@ -6,6 +7,7 @@ from flask_restful import Resource, Api, reqparse
 from distutils.log import debug 
 from fileinput import filename 
 from werkzeug.utils import secure_filename
+from sqlalchemy import func
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -389,6 +391,8 @@ def home():
 
 @app.route("/user-login", methods = ["GET","POST"])
 def userLogin():
+    if 'user_id' in session:
+        return redirect(url_for('allBooks', userid=session['user_id']))
     if request.method == 'POST':
         data = request.form.to_dict()
         # print(data['username'])
@@ -452,7 +456,7 @@ def addSection():
         section = Section(Title=data['section'], Description=data['text'])
         db.session.add(section)
         db.session.commit()
-        print(data)
+        # print(data)
         section = Section.query.all()
         return render_template("add-section.html", section = section)
     else:
@@ -622,6 +626,20 @@ def requestedBooks():
         BookIssueMerge.UserName.isnot(None)).all()
     
     return render_template("requestBooks.html", books=BookIssueMergeTable, approvedBooks = ApprovedBookIssueMergeTable, rejectedBooks = RejectedBookIssueMergeTable)
+
+@app.route("/adminStats", methods=["GET","POST"])
+def adminStats():
+    users = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    admins = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    total_books = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    total_issued = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    total_requests = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    total_rejected = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    total_expired = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    most_requested_books = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    top_books = db.session.query(User.role, func.count()).group_by(User.role).order_by(func.count().desc()).all()
+    print(users)
+    return render_template("myBooks.html")
 
 @app.route('/download-book/<path:filename>')
 def download_book(filename):
