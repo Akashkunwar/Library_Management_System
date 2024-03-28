@@ -8,6 +8,8 @@ from distutils.log import debug
 from fileinput import filename 
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -630,14 +632,38 @@ def requestedBooks():
 @app.route("/adminStats", methods=["GET","POST"])
 def adminStats():
     users = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    admins = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    admins = db.session.query(func.count()).filter(User.Role == "admin").scalar()
     total_books = db.session.query(func.count()).filter(User.Role == "user").scalar()
     total_issued = db.session.query(func.count()).filter(User.Role == "user").scalar()
     total_requests = db.session.query(func.count()).filter(User.Role == "user").scalar()
     total_rejected = db.session.query(func.count()).filter(User.Role == "user").scalar()
     total_expired = db.session.query(func.count()).filter(User.Role == "user").scalar()
     most_requested_books = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    top_books = db.session.query(User.role, func.count()).group_by(User.role).order_by(func.count().desc()).all()
+    # top_books = db.session.query(User.role, func.count()).group_by(User.role).order_by(func.count().desc()).all()
+
+    # Data preparation for charts
+    labels = ['Users', 'Admins']
+    sizes = [users, admins]
+    colors = ['#ff9999', '#66b3ff']  # Colors for pie chart
+    bar_colors = ['#1f77b4', '#ff7f0e']  # Colors for bar chart
+
+    # Plotting pie chart
+    plt.figure(figsize=(10, 6))
+    plt.subplot(1, 2, 1)
+    plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
+    plt.title('Distribution of Users and Admins')
+
+    # Plotting bar chart
+    plt.subplot(1, 2, 2)
+    sns.barplot(x=labels, y=sizes, palette=bar_colors)
+    plt.ylabel('Count')
+    plt.title('Count of Users and Admins')
+
+    # Adjust layout and save the figure
+    plt.tight_layout()
+    plt.savefig('Graphs/user_admin_distribution.png')
+    plt.show()
+
     print(users)
     return render_template("myBooks.html")
 
