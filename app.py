@@ -4,10 +4,12 @@ import datetime
 from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse
-from distutils.log import debug 
-from fileinput import filename 
-from werkzeug.utils import secure_filename
-from sqlalchemy import func
+# from distutils.log import debug 
+# from fileinput import filename 
+# from werkzeug.utils import secure_filename
+from sqlalchemy import func, and_
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -512,7 +514,6 @@ def updateBooks(BooksId):
 
     if request.method == 'POST':
         data = request.form.to_dict()
-        book.SectionId = 1
         book.Title = data['Title']
         book.Author = data['Author']
         book.Content = data['Content']
@@ -526,6 +527,8 @@ def updateBooks(BooksId):
 
 @app.route("/allBooks", methods=["GET","POST"])
 def allBooks():
+    if 'user_id' not in session:
+        return redirect(url_for('userLogin'))
     if request.method == 'POST':
         data = request.form.to_dict()
         print(data)
@@ -539,13 +542,14 @@ def allBooks():
         return render_template("allBooks.html", books=bookSec, userid = userid)
     else:
         bookSec = BookSection.query.all()
-        # books = Books.query.all()
         userid = request.args.get('userid')
         return render_template("allBooks.html", books=bookSec, userid = userid)
 
 @app.route("/myBooks", methods=["GET","POST"])
 def myBooks():
     print(session['user_id'])
+    if 'user_id' not in session:
+        return redirect(url_for('userLogin'))
     if request.method == "POST":
         data = request.form.to_dict()
         Issue_id = int(data["id"])
@@ -631,41 +635,119 @@ def requestedBooks():
 
 @app.route("/adminStats", methods=["GET","POST"])
 def adminStats():
-    users = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    admins = db.session.query(func.count()).filter(User.Role == "admin").scalar()
-    total_books = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    total_issued = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    total_requests = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    total_rejected = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    total_expired = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    most_requested_books = db.session.query(func.count()).filter(User.Role == "user").scalar()
-    # top_books = db.session.query(User.role, func.count()).group_by(User.role).order_by(func.count().desc()).all()
+    # users = db.session.query(func.count()).filter(User.Role == "user").scalar()
+    # admins = db.session.query(func.count()).filter(User.Role == "admin").scalar()
+    user_type = db.session.query(User.Role, func.count()).group_by(User.Role).order_by(func.count().desc()).all()
+    roles, counts = zip(*user_type)
+    plt.figure(figsize=(8, 6))
+    plt.pie(counts, labels=roles, autopct='%1.1f%%', startangle=140, colors=sns.color_palette("bright"), textprops={'fontsize': 12})
+    # plt.title('Distribution of Users by Role', fontsize=14)
 
-    # Data preparation for charts
-    labels = ['Users', 'Admins']
-    sizes = [users, admins]
-    colors = ['#ff9999', '#66b3ff']  # Colors for pie chart
-    bar_colors = ['#1f77b4', '#ff7f0e']  # Colors for bar chart
+    plt.axis('equal')
+    plt.savefig('static/Graphs/graph1.png')
 
-    # Plotting pie chart
-    plt.figure(figsize=(10, 6))
-    plt.subplot(1, 2, 1)
-    plt.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=140)
-    plt.title('Distribution of Users and Admins')
+    use, counts = zip(*user_type)
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=use, y=counts, hue=use, palette="viridis")
+    sns.despine()
+    plt.xlabel('Role', fontsize=12)
+    plt.ylabel('Count', fontsize=12)
 
-    # Plotting bar chart
-    plt.subplot(1, 2, 2)
-    sns.barplot(x=labels, y=sizes, palette=bar_colors)
-    plt.ylabel('Count')
-    plt.title('Count of Users and Admins')
+    for i, count in enumerate(counts):
+        plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
 
-    # Adjust layout and save the figure
-    plt.tight_layout()
-    plt.savefig('Graphs/user_admin_distribution.png')
-    plt.show()
+    plt.savefig('static/Graphs/graph2.png')
 
-    print(users)
-    return render_template("myBooks.html")
+    Issuestat = db.session.query(BookIssueMerge.IssueStatus, func.count()).group_by(BookIssueMerge.IssueStatus).order_by(func.count().desc()).all()
+    print(Issuestat)
+    issuemerge, counts = zip(*Issuestat)
+
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=issuemerge, y=counts, palette="viridis")
+    sns.despine()
+    plt.xlabel('Issue Status', fontsize=12)
+    plt.ylabel('Count', fontsize=12)
+    plt.title('Count of Books by Issue Status', fontsize=14)
+
+    for i, count in enumerate(counts):
+        plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
+
+    plt.savefig('static/Graphs/graph3.png')
+    
+    Sections = db.session.query(BookSection.Section_Title, func.count()).group_by(BookSection.Section_Title).order_by(func.count().desc()).all()
+
+    sections, counts = zip(*Sections)
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=sections, y=counts, hue=sections, palette="viridis")
+    sns.despine()
+    plt.xlabel('Section', fontsize=12)
+    plt.ylabel('Count', fontsize=12)
+
+    for i, count in enumerate(counts):
+        plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
+
+    plt.savefig('static/Graphs/graph4.png')
+
+    return render_template("adminStats.html", header = "headerAdmin.html", Graph1 = "Admin & User Count Pie chart", Graph2 = "Admin & User Count Bar", Graph3 = "Books Request Status", Graph4 = "Section-wise Book Count")
+
+@app.route("/userStats", methods=["GET","POST"])
+def userStats():
+    if 'user_id' not in session:
+        return redirect(url_for('userLogin'))
+    requestStatus = db.session.query(BookIssueMerge.IssueStatus, func.count()).filter(and_(BookIssueMerge.UserId == session['user_id'])).group_by(BookIssueMerge.IssueStatus).order_by(func.count().desc()).all()
+    print(requestStatus)
+    # user_type = db.session.query(User.Role, func.count()).group_by(User.Role).order_by(func.count().desc()).all()
+    roles, counts = zip(*requestStatus)
+    plt.figure(figsize=(8, 6))
+    plt.pie(counts, labels=roles, autopct='%1.1f%%', startangle=140, colors=sns.color_palette("bright"), textprops={'fontsize': 12})
+    # plt.title('', fontsize=14)
+
+    plt.axis('equal')
+    plt.savefig('static/Graphs/graph1.png')
+
+
+    sections, counts = zip(*requestStatus)
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=sections, y=counts, hue=sections, palette="viridis")
+    sns.despine()
+    plt.xlabel('Issue Status', fontsize=12)
+    plt.ylabel('Count', fontsize=12)
+
+    for i, count in enumerate(counts):
+        plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
+
+    plt.savefig('static/Graphs/graph2.png')
+
+    buks = db.session.query(func.count(Books.BookId)).scalar()
+    secs = db.session.query(func.count(Section.SectionId)).scalar()
+    labels = ['Books', 'Sections']
+    counts = [buks, secs]
+
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=labels, y=counts, palette='viridis')
+    plt.xlabel('Category', fontsize=12)
+    plt.ylabel('Count', fontsize=12)
+    # plt.title('Number of Books and Sections', fontsize=14)
+
+    for i, count in enumerate(counts):
+        plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
+
+    plt.savefig('static/Graphs/graph3.png')
+
+    Sections = db.session.query(BookSection.Section_Title, func.count()).group_by(BookSection.Section_Title).order_by(func.count().desc()).all()
+
+    sections, counts = zip(*Sections)
+    plt.figure(figsize=(8, 6))
+    sns.barplot(x=sections, y=counts, hue=sections, palette="viridis")
+    sns.despine()
+    plt.xlabel('Section', fontsize=12)
+    plt.ylabel('Count', fontsize=12)
+
+    for i, count in enumerate(counts):
+        plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
+
+    plt.savefig('static/Graphs/graph4.png')
+    return render_template("adminStats.html", header = "header.html", Graph1 = "My request Status Pie", Graph2 = "My request Status Bar", Graph3 = "Books & Section Counts", Graph4 = "Section-wise Book Count")
 
 @app.route('/download-book/<path:filename>')
 def download_book(filename):
