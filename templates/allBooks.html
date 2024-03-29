@@ -14,14 +14,18 @@
         <div class="main-container">
           {% for book in books %}
           <div class="section-container" id="1">
-            <h2>{{book.Books_BookId}} {{book.Books_Title}}</h2>
+            <h2>{{book.Books_Title}}</h2>
             <p>Book Author : {{book.Books_Author}}</p>
             <div>
               <p>Book Section : {{book.Section_Title}}</p>
             </div>
             <form action="/allBooks" method="post">
               <input type="hidden" name="userid" value="{{userid}}" />
-              <input type="hidden" name="bookid" value="{{book.Books_BookId}}" />
+              <input
+                type="hidden"
+                name="bookid"
+                value="{{book.Books_BookId}}"
+              />
               <input
                 type="hidden"
                 name="sectionId"
@@ -53,5 +57,38 @@
         {% include 'footer.html' %}
       </div>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("searchInput");
+
+        searchInput.addEventListener("input", function () {
+          const searchValue = searchInput.value.toLowerCase();
+          const sectionContainers =
+            document.querySelectorAll(".section-container");
+
+          sectionContainers.forEach(function (container) {
+            const title = container
+              .querySelector("h2")
+              .textContent.toLowerCase();
+            const author = container
+              .querySelector("p:nth-child(2)")
+              .textContent.toLowerCase();
+            const section = container
+              .querySelector("p:nth-child(4)")
+              .textContent.toLowerCase();
+
+            if (
+              title.includes(searchValue) ||
+              author.includes(searchValue) ||
+              section.includes(searchValue)
+            ) {
+              container.style.display = "block";
+            } else {
+              container.style.display = "none";
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>

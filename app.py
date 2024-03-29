@@ -1,12 +1,8 @@
-# from crypt import methods
 import os
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api, reqparse
-# from distutils.log import debug 
-# from fileinput import filename 
-# from werkzeug.utils import secure_filename
 from sqlalchemy import func, and_
 import matplotlib
 matplotlib.use('agg')
@@ -405,7 +401,7 @@ def userLogin():
             userid = user.UserId
 
             if user:
-                if user.Password == data["password"]:
+                if user.Password == data["password"] and user.Role == 'user':
                     print(user.UserId)
                     session['user_id'] = user.UserId
                     return redirect(url_for('allBooks', userid = userid))
@@ -547,7 +543,6 @@ def allBooks():
 
 @app.route("/myBooks", methods=["GET","POST"])
 def myBooks():
-    print(session['user_id'])
     if 'user_id' not in session:
         return redirect(url_for('userLogin'))
     if request.method == "POST":

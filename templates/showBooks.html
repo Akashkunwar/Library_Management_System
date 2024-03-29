@@ -14,7 +14,7 @@
         <div class="main-container">
           {% for book in books %}
           <div class="section-container" id="1">
-            <h2>{{book.Books_BookId}} {{book.Books_Title}}</h2>
+            <h2>{{book.Books_Title}}</h2>
             <p>Book Author : {{book.Books_Author}}</p>
             <p>
               Book Link :
@@ -50,7 +50,6 @@
                 Delete
               </button>
             </form>
-            <!-- <button type="button" class="btn btn-outline-danger">Delete</button> -->
           </div>
           {% include 'editBookPopup.html' %} {% include 'showBookPopup.html' %}
           {% endfor %}
