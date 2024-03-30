@@ -1,3 +1,4 @@
+# from crypt import methods
 import os
 import datetime
 from flask import Flask, render_template, request, redirect, url_for, send_file, session, flash
@@ -395,16 +396,14 @@ def userLogin():
         return redirect(url_for('allBooks', userid=session['user_id']))
     if request.method == 'POST':
         data = request.form.to_dict()
-        # print(data['username'])
         try:
             user = User.query.filter_by(UserName=data['username']).first()
-            userid = user.UserId
+            # userid = user.UserId
 
             if user:
                 if user.Password == data["password"] and user.Role == 'user':
-                    print(user.UserId)
                     session['user_id'] = user.UserId
-                    return redirect(url_for('allBooks', userid = userid))
+                    return redirect(url_for('myBooks'))
                 else:
                     return render_template("user-login.html", error="Wrong Password")
             else:
@@ -414,8 +413,23 @@ def userLogin():
     else:
         return render_template("user-login.html")
 
+@app.route("/logout", methods = ["GET", "POST"])
+def logout():
+    try:
+        print("userid : ",session['user_id'])
+        session.pop('user_id', None)
+        # print("userid : ",session['user_id'])
+        return redirect(url_for('home'))
+    except:
+        print("adminid : ",session['admin_id'])
+        session.pop('admin_id', None)
+        # print("adminid : ",session['admin_id'])
+        return redirect(url_for('home'))
+
 @app.route("/register", methods = ["GET","POST"])
 def userRegister():
+    if 'user_id' in session:
+        return redirect(url_for('myBooks'))
     if request.method =='POST':
         data = request.form.to_dict()
         user = User.query.filter_by(UserName=data['Username']).first()
@@ -431,6 +445,8 @@ def userRegister():
 
 @app.route("/librarian-login", methods = ["GET","POST"])
 def librarianLogin():
+    if 'admin_id' in session:
+        return redirect(url_for('requestedBooks'))
     if request.method == 'POST':
         data = request.form.to_dict()
         # print(data)
@@ -438,7 +454,8 @@ def librarianLogin():
             user = User.query.filter_by(UserName=data['username']).first()
             if user:
                 if user.Password == data["password"]:
-                    return redirect(url_for('addSection'))
+                    session['admin_id'] = user.UserId
+                    return redirect(url_for('requestedBooks'))
                     # return render_template("add-section.html")
                 else:
                     return render_template("librarian-login.html", error="Wrong Password")
@@ -451,6 +468,8 @@ def librarianLogin():
 
 @app.route("/add-section", methods = ["GET","POST"])
 def addSection():
+    if 'admin_id' not in session:
+        return redirect(url_for('librarianLogin'))
     if request.method == 'POST':
         data = request.form.to_dict()
         section = Section(Title=data['section'], Description=data['text'])
@@ -465,6 +484,8 @@ def addSection():
 
 @app.route("/showBooks", methods = ["GET","POST"])
 def showBooks():
+    if 'admin_id' not in session:
+        return redirect(url_for('librarianLogin'))
     if request.method == 'POST': 
         data = request.form.to_dict()
         f = request.files['file']
@@ -527,14 +548,14 @@ def allBooks():
         return redirect(url_for('userLogin'))
     if request.method == 'POST':
         data = request.form.to_dict()
-        print(data)
-        requstBook = BookIssue(UserId=data['userid'], BookId=data['bookid'], SectionId=data['sectionId'], Days=data['days'], IssueStatus = 'requested', IssueDate = datetime.datetime.today().date())
+        # print(data)
+        requstBook = BookIssue(UserId=session['user_id'], BookId=data['bookid'], SectionId=data['sectionId'], Days=data['days'], IssueStatus = 'requested', IssueDate = datetime.datetime.today().date())
         db.session.add(requstBook)
         db.session.commit()
 
         bookSec = BookSection.query.all()
         books = Books.query.all()
-        userid = data['userid']
+        userid = session['user_id']
         return render_template("allBooks.html", books=bookSec, userid = userid)
     else:
         bookSec = BookSection.query.all()
@@ -593,6 +614,8 @@ def myBooks():
 
 @app.route("/requestedBooks", methods=["GET","POST"])
 def requestedBooks():
+    if 'admin_id' not in session:
+        return redirect(url_for('librarianLogin'))
     if request.method == "POST":
         data = request.form.to_dict()
         Issue_id = int(data["id"])
@@ -630,6 +653,8 @@ def requestedBooks():
 
 @app.route("/adminStats", methods=["GET","POST"])
 def adminStats():
+    if 'admin_id' not in session:
+        return redirect(url_for('librarianLogin'))
     # users = db.session.query(func.count()).filter(User.Role == "user").scalar()
     # admins = db.session.query(func.count()).filter(User.Role == "admin").scalar()
     user_type = db.session.query(User.Role, func.count()).group_by(User.Role).order_by(func.count().desc()).all()

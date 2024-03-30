@@ -80,84 +80,12 @@
                 Delete Section
               </button>
             </form>
-            <!-- <button
-              type="button"
-              id="deleteSection{{ sec.SectionId }}"
-              class="btn btn-primary"
-            >
-              Add Books
-            </button> -->
           </div>
           {% include 'addBookPopup.html' %}{% endfor %}
         </div>
       </div>
       {% include 'footer.html' %}
     </div>
-    <!-- <script>
-      addSection.addEventListener("click", function () {
-        addSectionPopup.classList.add("show");
-      });
-      closePopup.addEventListener("click", function () {
-        addSectionPopup.classList.remove("show");
-      });
-      window.addEventListener("click", function (event) {
-        if (event.target == addSectionPopup) {
-          addSectionPopup.classList.remove("show");
-        }
-      });
-
-      const hiddenDateInput = document.querySelector('input[name="date"]');
-      const currentDate = document.getElementById("current-date");
-      const d = new Date();
-      const options = {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      };
-      const formattedDate = d.toLocaleDateString("en-GB", options);
-      currentDate.textContent = formattedDate;
-      hiddenDateInput.value = formattedDate;
-
-      const mainContainer = document.querySelector(".main-container");
-
-      mainContainer.addEventListener("click", function (event) {
-        if (
-          event.target.closest(".section-container") &&
-          !event.target.matches('[id^="addBook"]')
-        ) {
-          window.location.href = "/showBooks";
-        }
-        if (event.target.matches('[id^="addBook"]')) {
-          const sectionId = event.target.id.replace("addBook", "");
-          const popupId = `addBookPopup${sectionId}`;
-          const addBookPopup = document.getElementById(popupId);
-          if (addBookPopup) {
-            addBookPopup.classList.toggle("show");
-          }
-        }
-      });
-
-      const closeBookPopups = document.querySelectorAll(
-        '[id^="closeBookPopup"]'
-      );
-
-      closeBookPopups.forEach(function (closeButton) {
-        closeButton.addEventListener("click", function () {
-          const addBookPopup =
-            closeButton.parentElement.parentElement.parentElement;
-
-          if (addBookPopup) {
-            addBookPopup.classList.remove("show");
-          }
-        });
-      });
-
-      // document.getElementById("1").addEventListener("click", function (event) {
-      //   if (event.target.id === "1") {
-      //     window.location.href = "/showBooks";
-      //   }
-      // });
-    </script> -->
     <script>
       addSection.addEventListener("click", function () {
         addSectionPopup.classList.add("show");
