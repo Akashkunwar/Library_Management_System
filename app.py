@@ -22,6 +22,16 @@ app.app_context().push()
 
 api = Api(app)
 
+# For Graphs to not show old one
+def delete_file_if_exists(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)s
+
+file_paths = ["static\Graphs\graph1.png","static\Graphs\graph2.png","static\Graphs\graph3.png","static\Graphs\graph4.png",]
+for file in file_paths:
+    delete_file_if_exists(file)
+
+
 class User(db.Model):
     __tablename__ = 'user'
     UserId = db.Column(db.Integer, autoincrement=True, primary_key=True)
@@ -108,6 +118,7 @@ section_parser = reqparse.RequestParser()
 section_parser.add_argument('Title', type=str, required=True, help='Title is required')
 section_parser.add_argument('Description', type=str, required=True, help='Description is required')
 section_parser.add_argument('ImageLink', type=str)
+
 class SectionAPI(Resource):
     def get(self, section_id=None):
         if section_id:
@@ -398,8 +409,6 @@ def userLogin():
         data = request.form.to_dict()
         try:
             user = User.query.filter_by(UserName=data['username']).first()
-            # userid = user.UserId
-
             if user:
                 if user.Password == data["password"] and user.Role == 'user':
                     session['user_id'] = user.UserId
@@ -415,15 +424,13 @@ def userLogin():
 
 @app.route("/logout", methods = ["GET", "POST"])
 def logout():
-    try:
-        print("userid : ",session['user_id'])
+    if 'user_id' in session:
         session.pop('user_id', None)
-        # print("userid : ",session['user_id'])
         return redirect(url_for('home'))
-    except:
-        print("adminid : ",session['admin_id'])
+    elif 'admin_id' in session:
         session.pop('admin_id', None)
-        # print("adminid : ",session['admin_id'])
+        return redirect(url_for('home'))
+    else:
         return redirect(url_for('home'))
 
 @app.route("/register", methods = ["GET","POST"])
@@ -449,14 +456,12 @@ def librarianLogin():
         return redirect(url_for('requestedBooks'))
     if request.method == 'POST':
         data = request.form.to_dict()
-        # print(data)
         try:
             user = User.query.filter_by(UserName=data['username']).first()
             if user:
                 if user.Password == data["password"]:
                     session['admin_id'] = user.UserId
                     return redirect(url_for('requestedBooks'))
-                    # return render_template("add-section.html")
                 else:
                     return render_template("librarian-login.html", error="Wrong Password")
             else:
@@ -475,7 +480,6 @@ def addSection():
         section = Section(Title=data['section'], Description=data['text'])
         db.session.add(section)
         db.session.commit()
-        # print(data)
         section = Section.query.all()
         return render_template("add-section.html", section = section)
     else:
@@ -492,11 +496,9 @@ def showBooks():
         new_filename = (data['Book-Title']+"_"+data['Author']+".pdf").replace(" ","_")
         file_path = os.path.join("books", new_filename)
         f.save(file_path) 
-        print(data)
         books = Books(SectionId = data['book_section'],Title=data['Book-Title'],Author=data['Author'],Content=data['Content'], ImageLink=new_filename)
         db.session.add(books)
         db.session.commit()
-        print(data)
         bookSec = BookSection.query.all()
         return render_template("showBooks.html", books=bookSec)
     else:
@@ -507,7 +509,6 @@ def showBooks():
 def deleteBook(bookId):
     book = Books.query.get(bookId)
     if book:
-        print(book.ImageLink)
         file_path = os.path.join("books", book.ImageLink)
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -548,13 +549,11 @@ def allBooks():
         return redirect(url_for('userLogin'))
     if request.method == 'POST':
         data = request.form.to_dict()
-        # print(data)
         requstBook = BookIssue(UserId=session['user_id'], BookId=data['bookid'], SectionId=data['sectionId'], Days=data['days'], IssueStatus = 'requested', IssueDate = datetime.datetime.today().date())
         db.session.add(requstBook)
         db.session.commit()
 
         bookSec = BookSection.query.all()
-        books = Books.query.all()
         userid = session['user_id']
         return render_template("allBooks.html", books=bookSec, userid = userid)
     else:
@@ -679,20 +678,22 @@ def adminStats():
     plt.savefig('static/Graphs/graph2.png')
 
     Issuestat = db.session.query(BookIssueMerge.IssueStatus, func.count()).group_by(BookIssueMerge.IssueStatus).order_by(func.count().desc()).all()
-    print(Issuestat)
-    issuemerge, counts = zip(*Issuestat)
+    try:
+        issuemerge, counts = zip(*Issuestat)
 
-    plt.figure(figsize=(8, 6))
-    sns.barplot(x=issuemerge, y=counts, palette="viridis")
-    sns.despine()
-    plt.xlabel('Issue Status', fontsize=12)
-    plt.ylabel('Count', fontsize=12)
-    plt.title('Count of Books by Issue Status', fontsize=14)
+        plt.figure(figsize=(8, 6))
+        sns.barplot(x=issuemerge, y=counts, palette="viridis")
+        sns.despine()
+        plt.xlabel('Issue Status', fontsize=12)
+        plt.ylabel('Count', fontsize=12)
+        plt.title('Count of Books by Issue Status', fontsize=14)
 
-    for i, count in enumerate(counts):
-        plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
+        for i, count in enumerate(counts):
+            plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
 
-    plt.savefig('static/Graphs/graph3.png')
+        plt.savefig('static/Graphs/graph3.png')
+    except:
+        pass
     
     Sections = db.session.query(BookSection.Section_Title, func.count()).group_by(BookSection.Section_Title).order_by(func.count().desc()).all()
 
@@ -715,28 +716,30 @@ def userStats():
     if 'user_id' not in session:
         return redirect(url_for('userLogin'))
     requestStatus = db.session.query(BookIssueMerge.IssueStatus, func.count()).filter(and_(BookIssueMerge.UserId == session['user_id'])).group_by(BookIssueMerge.IssueStatus).order_by(func.count().desc()).all()
-    print(requestStatus)
     # user_type = db.session.query(User.Role, func.count()).group_by(User.Role).order_by(func.count().desc()).all()
-    roles, counts = zip(*requestStatus)
-    plt.figure(figsize=(8, 6))
-    plt.pie(counts, labels=roles, autopct='%1.1f%%', startangle=140, colors=sns.color_palette("bright"), textprops={'fontsize': 12})
-    # plt.title('', fontsize=14)
+    try:
+        roles, counts = zip(*requestStatus)
+        plt.figure(figsize=(8, 6))
+        plt.pie(counts, labels=roles, autopct='%1.1f%%', startangle=140, colors=sns.color_palette("bright"), textprops={'fontsize': 12})
+        # plt.title('', fontsize=14)
 
-    plt.axis('equal')
-    plt.savefig('static/Graphs/graph1.png')
+        plt.axis('equal')
+        plt.savefig('static/Graphs/graph1.png')
+    
+        sections, counts = zip(*requestStatus)
+        plt.figure(figsize=(8, 6))
+        sns.barplot(x=sections, y=counts, hue=sections, palette="viridis")
+        sns.despine()
+        plt.xlabel('Issue Status', fontsize=12)
+        plt.ylabel('Count', fontsize=12)
 
+        for i, count in enumerate(counts):
+            plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
 
-    sections, counts = zip(*requestStatus)
-    plt.figure(figsize=(8, 6))
-    sns.barplot(x=sections, y=counts, hue=sections, palette="viridis")
-    sns.despine()
-    plt.xlabel('Issue Status', fontsize=12)
-    plt.ylabel('Count', fontsize=12)
-
-    for i, count in enumerate(counts):
-        plt.text(i, count + 0.1, str(count), ha='center', va='bottom', fontsize=10)
-
-    plt.savefig('static/Graphs/graph2.png')
+        plt.savefig('static/Graphs/graph2.png')
+        
+    except:
+        pass
 
     buks = db.session.query(func.count(Books.BookId)).scalar()
     secs = db.session.query(func.count(Section.SectionId)).scalar()

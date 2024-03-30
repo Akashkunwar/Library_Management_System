@@ -1,5 +1,5 @@
 Flask
 Flask-SQLAlchemy
-flask-restful
-email-validator
-bcrypt
+Flask-RESTful
+matplotlib
+seaborn
