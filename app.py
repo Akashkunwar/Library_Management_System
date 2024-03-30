@@ -25,7 +25,7 @@ api = Api(app)
 # For Graphs to not show old one
 def delete_file_if_exists(file_path):
     if os.path.exists(file_path):
-        os.remove(file_path)s
+        os.remove(file_path)
 
 file_paths = ["static\Graphs\graph1.png","static\Graphs\graph2.png","static\Graphs\graph3.png","static\Graphs\graph4.png",]
 for file in file_paths:
@@ -396,6 +396,17 @@ class BookSection(db.Model):
     Books_Author = db.Column(db.String(50), nullable=False)
     Books_Content = db.Column(db.Text)
     Books_ImageLink = db.Column(db.String(255))
+
+# Expire if date passed
+def update_issue_status():
+    with app.app_context():
+        today = datetime.date.today().strftime('%Y-%m-%d')
+        book_issues_to_update = BookIssue.query.filter(BookIssue.IssueStatus == 'Approved', BookIssue.IssueDate < today).all()
+        for book_issue in book_issues_to_update:
+            book_issue.IssueStatus = 'Rejected'
+        db.session.commit()
+
+update_issue_status()
 
 @app.route("/", methods = ["GET","POST"])
 def home():
