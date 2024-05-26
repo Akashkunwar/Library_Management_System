@@ -107,8 +107,10 @@ The Library Management System is a multi-user application designed to efficientl
 3. Explore the functionalities of the system such as adding sections, managing books, issuing and returning books, and visualizing data.
 
 ## ER Diagram
+![ER Diagram](https://raw.githubusercontent.com/Akashkunwar/Library_Management_System/main/ERD.png)
 
-![ER Diagram](https://raw.githubusercontent.com/Akashkunwar/Library_Management_System/main/LMS.jpeg)
+## Wireframe
+![Wireframe](https://raw.githubusercontent.com/Akashkunwar/Library_Management_System/main/LMS.jpeg)
 
 ## Future Enhancements
 
