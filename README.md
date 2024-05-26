@@ -108,7 +108,7 @@ The Library Management System is a multi-user application designed to efficientl
 
 ## ER Diagram
 
-![ER Diagram](path_to_er_diagram_image)
+![ER Diagram](https://raw.githubusercontent.com/Akashkunwar/Library_Management_System/main/LMS.jpeg)
 
 ## Future Enhancements
 
