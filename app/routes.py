@@ -52,7 +52,7 @@ def userRegister():
         data = request.form.to_dict()
         user = User.query.filter_by(UserName=data['Username']).first()
         if user:
-            return render_template("templates/user-login.html", error="User already registered please login!")
+            return render_template("user-login.html", error="User already registered please login!")
         else:
             user = User(UserName=data['Username'], Password=data['password'], Role='user')
             db.session.add(user)
@@ -105,7 +105,7 @@ def showBooks():
         data = request.form.to_dict()
         f = request.files['file']
         new_filename = (data['Book-Title']+"_"+data['Author']+".pdf").replace(" ","_")
-        file_path = os.path.join("books", new_filename)
+        file_path = os.path.join("app/books", new_filename)
         f.save(file_path) 
         books = Books(SectionId = data['book_section'],Title=data['Book-Title'],Author=data['Author'],Content=data['Content'], ImageLink=new_filename)
         db.session.add(books)
@@ -120,7 +120,7 @@ def showBooks():
 def deleteBook(bookId):
     book = Books.query.get(bookId)
     if book:
-        file_path = os.path.join("books", book.ImageLink)
+        file_path = os.path.join("app/books", book.ImageLink)
         if os.path.exists(file_path):
             os.remove(file_path)
         db.session.delete(book)
@@ -386,5 +386,5 @@ def userStats():
 
 @app.route('/download-book/<path:filename>')
 def download_book(filename):
-    pdf_path = os.path.join("books", filename)
+    pdf_path = os.path.join("app/books", filename)
     return send_file(pdf_path, as_attachment=True)
